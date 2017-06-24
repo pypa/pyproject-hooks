@@ -28,14 +28,20 @@ class Pep517HookCaller(object):
         self.build_sys_requires = buildsys['requires']
         self.build_backend = buildsys['build_backend']
 
-    def get_build_requires(self, config_settings):
-        return self._call_hook('get_build_requires', {
+    def get_build_wheel_requires(self, config_settings):
+        return self._call_hook('get_build_wheel_requires', {
             'config_settings': config_settings
         })
 
     def get_wheel_metadata(self, metadata_directory, config_settings):
         return self._call_hook('get_wheel_metadata', {
             'metadata_directory': metadata_directory,
+            'config_settings': config_settings,
+        })
+
+    def prepare_build_wheel_files(self, build_directory, config_settings):
+        return self._call_hook('prepare_build_wheel_files', {
+            'build_directory': build_directory,
             'config_settings': config_settings,
         })
 
@@ -46,17 +52,17 @@ class Pep517HookCaller(object):
             'metadata_directory': metadata_directory,
         })
 
+    def get_build_sdist_requires(self, config_settings):
+        return self._call_hook('get_build_sdist_requires', {
+            'config_settings': config_settings
+        })
+
     def build_sdist(self, sdist_directory, config_settings):
         return self._call_hook('get_wheel_metadata', {
             'sdist_directory': sdist_directory,
             'config_settings': config_settings,
         })
 
-    def prepare_build_files(self, build_directory, config_settings):
-        return self._call_hook('prepare_build_files', {
-            'build_directory': build_directory,
-            'config_settings': config_settings,
-        })
 
     def _call_hook(self, hook_name, kwargs):
         env = os.environ.copy()
@@ -64,7 +70,10 @@ class Pep517HookCaller(object):
         with tempdir() as td:
             with io.open(pjoin(td, 'input.json'), 'w', encoding='utf-8') as f:
                 json.dump({'kwargs': kwargs}, f, indent=True)
-            check_call([sys.executable, _in_proc_script, hook_name, td])
+
+            # Run the hook in a subprocess
+            check_call([sys.executable, _in_proc_script, hook_name, td],
+                       cwd=self.source_dir)
 
             output_file = pjoin(td, 'output.json')
             if os.path.isfile(output_file):

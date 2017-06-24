@@ -31,14 +31,14 @@ def _build_backend():
             obj = getattr(obj, path_part)
     return obj
 
-def get_build_requires(config_settings):
-    """Invoke the optional get_build_requires hook
+def get_build_wheel_requires(config_settings):
+    """Invoke the optional get_build_wheel_requires hook
     
     Returns [] if the hook is not defined.
     """
     backend = _build_backend()
     try:
-        hook = backend.get_build_requires
+        hook = backend.get_build_wheel_requires
     except AttributeError:
         return []
     else:
@@ -108,6 +108,36 @@ def _find_already_built_wheel(metadata_directory):
     
     # Exactly one .whl file
     return whl_files[0]
+
+
+def prepare_build_wheel_files(build_directory, config_settings):
+    """Invoke the optional prepare_build_wheel_files hook.
+
+    Falls back to building and unpacking an sdist if the hook is not defined.
+    """
+    backend = _build_backend()
+    try:
+        hook = backend.prepare_build_wheel_files
+    except AttributeError:
+        _prepare_build_files_from_sdist(backend, build_directory,
+                                        config_settings)
+    else:
+        hook(build_directory, config_settings)
+
+
+def _prepare_build_files_from_sdist(backend, build_directory, config_settings):
+    """Fallback to use build_sdist when prepare_build_wheel_files not defined."""
+    import tarfile
+    td = tempfile.mkdtemp()
+    try:
+        sdist_basename = backend.build_sdist(td, config_settings)
+        sdist_file = pjoin(td, sdist_basename)
+        with tarfile.open(sdist_file) as tf:
+            dir_name = tf.getnames()[0].split('/')[0]
+            tf.extractall(path=td)
+            shutil.copytree(pjoin(td, dir_name), build_directory)
+    finally:
+        shutil.rmtree(td)
     
 
 def build_wheel(wheel_directory, config_settings, metadata_directory=None):
@@ -124,43 +154,32 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
     return _build_backend().build_wheel(wheel_directory, config_settings,
                                         metadata_directory)
 
+
+def get_build_sdist_requires(config_settings):
+    """Invoke the optional get_build_wheel_requires hook
+
+    Returns [] if the hook is not defined.
+    """
+    backend = _build_backend()
+    try:
+        hook = backend.get_build_sdist_requires
+    except AttributeError:
+        return []
+    else:
+        return hook(config_settings)
+
+
 def build_sdist(sdist_directory, config_settings):
     """Invoke the mandatory build_sdist hook."""
     return _build_backend().build_sdist(sdist_directory, config_settings)
 
-def prepare_build_files(build_directory, config_settings):
-    """Invoke the optional prepare_build_files hook.
-    
-    Falls back to building and unpacking an sdist if the hook is not defined.
-    """
-    backend = _build_backend()
-    try:
-        hook = backend.prepare_build_files
-    except AttributeError:
-        _prepare_build_files_from_sdist(backend, build_directory, config_settings)
-    else:
-        hook(build_directory, config_settings)
-
-def _prepare_build_files_from_sdist(backend, build_directory, config_settings):
-    """Fallback to use build_sdist when prepare_build_files not defined."""
-    import tarfile
-    td = tempfile.mkdtemp()
-    try:
-        sdist_basename = backend.build_sdist(td, config_settings)
-        sdist_file = pjoin(td, sdist_basename)
-        with tarfile.open(sdist_file) as tf:
-            dir_name = tf.getnames()[0].split('/')[0]
-            tf.extractall(path=td)
-            shutil.copytree(pjoin(td, dir_name), build_directory)
-    finally:
-        shutil.rmtree(td)
-
 HOOK_NAMES = {
-    'get_build_requires',
+    'get_build_wheel_requires',
     'prepare_wheel_metadata',
+    'prepare_build_wheel_files',
     'build_wheel',
+    'get_build_sdist_requires',
     'build_sdist',
-    'prepare_build_files',
 }
 
 def main():
