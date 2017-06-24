@@ -34,7 +34,7 @@ class Pep517HookCaller(object):
         })
 
     def prepare_wheel_metadata(self, metadata_directory, config_settings):
-        return self._call_hook('get_wheel_metadata', {
+        return self._call_hook('prepare_wheel_metadata', {
             'metadata_directory': metadata_directory,
             'config_settings': config_settings,
         })
@@ -58,7 +58,7 @@ class Pep517HookCaller(object):
         })
 
     def build_sdist(self, sdist_directory, config_settings):
-        return self._call_hook('get_wheel_metadata', {
+        return self._call_hook('build_sdist', {
             'sdist_directory': sdist_directory,
             'config_settings': config_settings,
         })
