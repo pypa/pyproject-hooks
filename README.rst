@@ -8,3 +8,5 @@ provides:
   the current process.
 - Fallbacks for the optional hooks, so that frontends can call the hooks without
   checking which are defined.
+
+Run the tests with ``py.test``.
