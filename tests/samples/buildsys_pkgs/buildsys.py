@@ -39,8 +39,11 @@ def build_sdist(sdist_directory, config_settings):
     target = 'pkg1-0.5.tar.gz'
     with tarfile.open(pjoin(sdist_directory, target), 'w:gz',
                       format=tarfile.PAX_FORMAT) as tf:
-        tf.add('pyproject.toml')
+        def _add(relpath):
+            tf.add(relpath, arcname='pkg1-0.5/' + relpath)
+
+        _add('pyproject.toml')
         for pyfile in glob('*.py'):
-            tf.add(pyfile)
+            _add(pyfile)
 
     return target

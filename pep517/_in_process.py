@@ -64,7 +64,7 @@ def _dist_info_files(whl_zip):
     """Identify the .dist-info folder inside a wheel ZipFile."""
     res = []
     for path in whl_zip.namelist():
-        m = re.match(r'[^/\\]-[^/\\]\.dist-info/', path)
+        m = re.match(r'[^/\\]+-[^/\\]+\.dist-info/', path)
         if m:
             res.append(path)
     if res:
@@ -124,6 +124,14 @@ def prepare_build_wheel_files(build_directory, config_settings):
     else:
         hook(build_directory, config_settings)
 
+def _copy_tree_merge(src, dst):
+    for basename in os.listdir(src):
+        srcpath = pjoin(src, basename)
+        dstpath = pjoin(dst, basename)
+        if os.path.isdir(srcpath):
+            shutil.copytree(srcpath, dstpath)
+        else:
+            shutil.copy(srcpath, dstpath)
 
 def _prepare_build_files_from_sdist(backend, build_directory, config_settings):
     """Fallback to use build_sdist when prepare_build_wheel_files not defined."""
@@ -135,7 +143,7 @@ def _prepare_build_files_from_sdist(backend, build_directory, config_settings):
         with tarfile.open(sdist_file) as tf:
             dir_name = tf.getnames()[0].split('/')[0]
             tf.extractall(path=td)
-            shutil.copytree(pjoin(td, dir_name), build_directory)
+            _copy_tree_merge(pjoin(td, dir_name), build_directory)
     finally:
         shutil.rmtree(td)
     

@@ -70,4 +70,4 @@ def test_build_sdist():
 
         with tarfile.open(sdist) as tf:
             contents = tf.getnames()
-        assert 'pyproject.toml' in contents
+        assert 'pkg1-0.5/pyproject.toml' in contents
