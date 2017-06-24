@@ -26,14 +26,14 @@ class Pep517HookCaller(object):
             self.pyproject_data = pytoml.load(f)
         buildsys = self.pyproject_data['build-system']
         self.build_sys_requires = buildsys['requires']
-        self.build_backend = buildsys['build_backend']
+        self.build_backend = buildsys['build-backend']
 
     def get_build_wheel_requires(self, config_settings):
         return self._call_hook('get_build_wheel_requires', {
             'config_settings': config_settings
         })
 
-    def get_wheel_metadata(self, metadata_directory, config_settings):
+    def prepare_wheel_metadata(self, metadata_directory, config_settings):
         return self._call_hook('get_wheel_metadata', {
             'metadata_directory': metadata_directory,
             'config_settings': config_settings,
@@ -73,7 +73,7 @@ class Pep517HookCaller(object):
 
             # Run the hook in a subprocess
             check_call([sys.executable, _in_proc_script, hook_name, td],
-                       cwd=self.source_dir)
+                       cwd=self.source_dir, env=env)
 
             output_file = pjoin(td, 'output.json')
             if os.path.isfile(output_file):
