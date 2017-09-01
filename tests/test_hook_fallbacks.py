@@ -1,9 +1,6 @@
-import os
 from os.path import dirname, abspath, join as pjoin
-import tarfile
 from testpath import modified_env, assert_isfile, assert_isdir
 from testpath.tempdir import TemporaryDirectory
-import zipfile
 
 from pep517.wrappers import Pep517HookCaller
 

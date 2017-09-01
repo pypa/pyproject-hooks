@@ -19,7 +19,6 @@ from os.path import join as pjoin
 import re
 import shutil
 import sys
-import tempfile
 
 def _build_backend():
     """Find and load the build backend"""
