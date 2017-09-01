@@ -20,6 +20,9 @@ import re
 import shutil
 import sys
 
+# This is run as a script, not a module, so it can't do a relative import
+import compat
+
 def _build_backend():
     """Find and load the build backend"""
     ep = os.environ['PEP517_BUILD_BACKEND']
@@ -166,9 +169,8 @@ def main():
     if hook_name not in HOOK_NAMES:
         sys.exit("Unknown hook: %s" % hook_name)
     hook = globals()[hook_name]
-    
-    with io.open(pjoin(control_dir, 'input.json'), encoding='utf-8') as f:
-        hook_input = json.load(f)
+
+    hook_input = compat.read_json(pjoin(control_dir, 'input.json'))
 
     json_out = {'unsupported': False, 'return_val': None}
     try:
@@ -176,8 +178,7 @@ def main():
     except GotUnsupportedOperation:
         json_out['unsupported'] = True
     
-    with io.open(pjoin(control_dir, 'output.json'), 'w', encoding='utf-8') as f:
-        json.dump(json_out, f, indent=2)
+    compat.write_json(json_out, pjoin(control_dir, 'output.json'), indent=2)
 
 if __name__ == '__main__':
     main()

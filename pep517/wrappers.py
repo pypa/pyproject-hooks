@@ -9,6 +9,8 @@ from subprocess import check_call
 import sys
 from tempfile import mkdtemp
 
+from . import compat
+
 _in_proc_script = pjoin(dirname(abspath(__file__)), '_in_process.py')
 
 @contextmanager
@@ -65,16 +67,14 @@ class Pep517HookCaller(object):
         env = os.environ.copy()
         env['PEP517_BUILD_BACKEND'] = self.build_backend
         with tempdir() as td:
-            with io.open(pjoin(td, 'input.json'), 'w', encoding='utf-8') as f:
-                json.dump({'kwargs': kwargs}, f, indent=True)
+            compat.write_json({'kwargs': kwargs}, pjoin(td, 'input.json'),
+                              indent=2)
 
             # Run the hook in a subprocess
             check_call([sys.executable, _in_proc_script, hook_name, td],
                        cwd=self.source_dir, env=env)
 
-            output_file = pjoin(td, 'output.json')
-            with io.open(output_file, encoding='utf-8') as f:
-                data = json.load(f)
+            data = compat.read_json(pjoin(td, 'output.json'))
             if data.get('unsupported'):
                 raise UnsupportedOperation
             return data['return_val']
