@@ -4,5 +4,5 @@ python:
   - "3.5"
   - "3.4"
   - "3.3"
-install: pip install testpath
+install: pip install testpath pytoml
 script: py.test
