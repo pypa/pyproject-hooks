@@ -31,13 +31,13 @@ class Pep517HookCaller(object):
         self.build_sys_requires = buildsys['requires']
         self.build_backend = buildsys['build-backend']
 
-    def get_build_wheel_requires(self, config_settings):
-        return self._call_hook('get_build_wheel_requires', {
+    def get_requires_for_build_wheel(self, config_settings):
+        return self._call_hook('get_requires_for_build_wheel', {
             'config_settings': config_settings
         })
 
-    def prepare_wheel_metadata(self, metadata_directory, config_settings):
-        return self._call_hook('prepare_wheel_metadata', {
+    def prepare_metadata_for_build_wheel(self, metadata_directory, config_settings):
+        return self._call_hook('prepare_metadata_for_build_wheel', {
             'metadata_directory': metadata_directory,
             'config_settings': config_settings,
         })
@@ -49,8 +49,8 @@ class Pep517HookCaller(object):
             'metadata_directory': metadata_directory,
         })
 
-    def get_build_sdist_requires(self, config_settings):
-        return self._call_hook('get_build_sdist_requires', {
+    def get_requires_for_build_sdist(self, config_settings):
+        return self._call_hook('get_requires_for_build_sdist', {
             'config_settings': config_settings
         })
 

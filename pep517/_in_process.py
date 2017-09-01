@@ -30,27 +30,27 @@ def _build_backend():
             obj = getattr(obj, path_part)
     return obj
 
-def get_build_wheel_requires(config_settings):
-    """Invoke the optional get_build_wheel_requires hook
+def get_requires_for_build_wheel(config_settings):
+    """Invoke the optional get_requires_for_build_wheel hook
     
     Returns [] if the hook is not defined.
     """
     backend = _build_backend()
     try:
-        hook = backend.get_build_wheel_requires
+        hook = backend.get_requires_for_build_wheel
     except AttributeError:
         return []
     else:
         return hook(config_settings)
 
-def prepare_wheel_metadata(metadata_directory, config_settings):
-    """Invoke optional prepare_wheel_metadata
+def prepare_metadata_for_build_wheel(metadata_directory, config_settings):
+    """Invoke optional prepare_metadata_for_build_wheel
     
     Implements a fallback by building a wheel if the hook isn't defined.
     """
     backend = _build_backend()
     try:
-        hook = backend.prepare_wheel_metadata
+        hook = backend.prepare_metadata_for_build_wheel
     except AttributeError:
         return _get_wheel_metadata_from_wheel(backend, metadata_directory,
                                               config_settings)
@@ -111,7 +111,7 @@ def _find_already_built_wheel(metadata_directory):
 def build_wheel(wheel_directory, config_settings, metadata_directory=None):
     """Invoke the mandatory build_wheel hook.
     
-    If a wheel was already built in the prepare_wheel_metadata fallback, this
+    If a wheel was already built in the prepare_metadata_for_build_wheel fallback, this
     will copy it rather than rebuilding the wheel.
     """
     prebuilt_whl = _find_already_built_wheel(metadata_directory)
@@ -123,14 +123,14 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
                                         metadata_directory)
 
 
-def get_build_sdist_requires(config_settings):
-    """Invoke the optional get_build_wheel_requires hook
+def get_requires_for_build_sdist(config_settings):
+    """Invoke the optional get_requires_for_build_wheel hook
 
     Returns [] if the hook is not defined.
     """
     backend = _build_backend()
     try:
-        hook = backend.get_build_sdist_requires
+        hook = backend.get_requires_for_build_sdist
     except AttributeError:
         return []
     else:
@@ -151,10 +151,10 @@ def build_sdist(sdist_directory, config_settings):
         raise GotUnsupportedOperation
 
 HOOK_NAMES = {
-    'get_build_wheel_requires',
-    'prepare_wheel_metadata',
+    'get_requires_for_build_wheel',
+    'prepare_metadata_for_build_wheel',
     'build_wheel',
-    'get_build_sdist_requires',
+    'get_requires_for_build_sdist',
     'build_sdist',
 }
 

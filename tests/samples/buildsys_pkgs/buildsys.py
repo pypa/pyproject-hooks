@@ -9,10 +9,10 @@ import shutil
 import tarfile
 from zipfile import ZipFile
 
-def get_build_wheel_requires(config_settings):
+def get_requires_for_build_wheel(config_settings):
     return ['wheelwright']
 
-def prepare_wheel_metadata(metadata_directory, config_settings):
+def prepare_metadata_for_build_wheel(metadata_directory, config_settings):
     for distinfo in glob('*.dist-info'):
         shutil.copytree(distinfo, pjoin(metadata_directory, distinfo))
 
@@ -32,7 +32,7 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
             zf.write(metadata)
     return whl_file
 
-def get_build_sdist_requires(config_settings):
+def get_requires_for_build_sdist(config_settings):
     return ['frog']
 
 class UnsupportedOperation(Exception):
