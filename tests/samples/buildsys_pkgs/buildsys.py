@@ -35,7 +35,13 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
 def get_build_sdist_requires(config_settings):
     return ['frog']
 
+class UnsupportedOperation(Exception):
+    pass
+
 def build_sdist(sdist_directory, config_settings):
+    if config_settings.get('test_unsupported', False):
+        raise UnsupportedOperation
+
     target = 'pkg1-0.5.tar.gz'
     with tarfile.open(pjoin(sdist_directory, target), 'w:gz',
                       format=tarfile.PAX_FORMAT) as tf:

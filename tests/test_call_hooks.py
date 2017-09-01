@@ -3,9 +3,10 @@ from os.path import dirname, abspath, join as pjoin
 import tarfile
 from testpath import modified_env, assert_isfile, assert_isdir
 from testpath.tempdir import TemporaryDirectory
+import pytest
 import zipfile
 
-from pep517.wrappers import Pep517HookCaller
+from pep517.wrappers import Pep517HookCaller, UnsupportedOperation
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
@@ -59,3 +60,11 @@ def test_build_sdist():
         with tarfile.open(sdist) as tf:
             contents = tf.getnames()
         assert 'pkg1-0.5/pyproject.toml' in contents
+
+def test_build_sdist_unsupported():
+    hooks = Pep517HookCaller(pjoin(SAMPLES_DIR, 'pkg1'))
+    with TemporaryDirectory() as sdistdir:
+        with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
+            with pytest.raises(UnsupportedOperation):
+                hooks.build_sdist(sdistdir, {'test_unsupported': True})
+
