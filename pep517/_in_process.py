@@ -109,45 +109,6 @@ def _find_already_built_wheel(metadata_directory):
     # Exactly one .whl file
     return whl_files[0]
 
-
-def prepare_build_wheel_files(build_directory, config_settings):
-    """Invoke the optional prepare_build_wheel_files hook.
-
-    Falls back to building and unpacking an sdist if the hook is not defined.
-    """
-    backend = _build_backend()
-    try:
-        hook = backend.prepare_build_wheel_files
-    except AttributeError:
-        _prepare_build_files_from_sdist(backend, build_directory,
-                                        config_settings)
-    else:
-        hook(build_directory, config_settings)
-
-def _copy_tree_merge(src, dst):
-    for basename in os.listdir(src):
-        srcpath = pjoin(src, basename)
-        dstpath = pjoin(dst, basename)
-        if os.path.isdir(srcpath):
-            shutil.copytree(srcpath, dstpath)
-        else:
-            shutil.copy(srcpath, dstpath)
-
-def _prepare_build_files_from_sdist(backend, build_directory, config_settings):
-    """Fallback to use build_sdist when prepare_build_wheel_files not defined."""
-    import tarfile
-    td = tempfile.mkdtemp()
-    try:
-        sdist_basename = backend.build_sdist(td, config_settings)
-        sdist_file = pjoin(td, sdist_basename)
-        with tarfile.open(sdist_file) as tf:
-            dir_name = tf.getnames()[0].split('/')[0]
-            tf.extractall(path=td)
-            _copy_tree_merge(pjoin(td, dir_name), build_directory)
-    finally:
-        shutil.rmtree(td)
-    
-
 def build_wheel(wheel_directory, config_settings, metadata_directory=None):
     """Invoke the mandatory build_wheel hook.
     
@@ -193,7 +154,6 @@ def build_sdist(sdist_directory, config_settings):
 HOOK_NAMES = {
     'get_build_wheel_requires',
     'prepare_wheel_metadata',
-    'prepare_build_wheel_files',
     'build_wheel',
     'get_build_sdist_requires',
     'build_sdist',

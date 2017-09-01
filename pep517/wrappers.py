@@ -42,12 +42,6 @@ class Pep517HookCaller(object):
             'config_settings': config_settings,
         })
 
-    def prepare_build_wheel_files(self, build_directory, config_settings):
-        return self._call_hook('prepare_build_wheel_files', {
-            'build_directory': build_directory,
-            'config_settings': config_settings,
-        })
-
     def build_wheel(self, wheel_directory, config_settings, metadata_directory=None):
         return self._call_hook('build_wheel', {
             'wheel_directory': wheel_directory,

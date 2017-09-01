@@ -30,23 +30,11 @@ def test_prepare_wheel_metadata():
 
         assert_isfile(pjoin(metadatadir, 'pkg1-0.5.dist-info', 'METADATA'))
 
-def test_prepare_build_wheel_files():
-    hooks = Pep517HookCaller(pjoin(SAMPLES_DIR, 'pkg1'))
-    with TemporaryDirectory() as builddir:
-        with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
-            hooks.prepare_build_wheel_files(builddir, {})
-
-        assert_isfile(pjoin(builddir, 'pyproject.toml'))
-        assert_isfile(pjoin(builddir, 'pkg1.py'))
-        assert_isdir(pjoin(builddir, 'pkg1-0.5.dist-info'))
-
 def test_build_wheel():
     hooks = Pep517HookCaller(pjoin(SAMPLES_DIR, 'pkg1'))
     with TemporaryDirectory() as builddir:
         with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
-            hooks.prepare_build_wheel_files(builddir, {})
-            wheel_hooks = Pep517HookCaller(builddir)
-            whl_file = wheel_hooks.build_wheel(builddir, {})
+            whl_file = hooks.build_wheel(builddir, {})
 
         assert whl_file.endswith('.whl')
         assert os.sep not in whl_file

@@ -29,13 +29,3 @@ def test_prepare_wheel_metadata():
             hooks.prepare_wheel_metadata(metadatadir, {})
 
         assert_isfile(pjoin(metadatadir, 'pkg2-0.5.dist-info', 'METADATA'))
-
-def test_prepare_build_wheel_files():
-    hooks = Pep517HookCaller(pjoin(SAMPLES_DIR, 'pkg2'))
-    with TemporaryDirectory() as builddir:
-        with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
-            hooks.prepare_build_wheel_files(builddir, {})
-
-        assert_isfile(pjoin(builddir, 'pyproject.toml'))
-        assert_isfile(pjoin(builddir, 'pkg2.py'))
-        assert_isdir(pjoin(builddir, 'pkg2-0.5.dist-info'))
