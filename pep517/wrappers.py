@@ -19,6 +19,9 @@ def tempdir():
     finally:
         shutil.rmtree(td)
 
+class UnsupportedOperation(Exception):
+    """May be raised by build_sdist if the backend indicates that it can't."""
+
 class Pep517HookCaller(object):
     def __init__(self, source_dir):
         self.source_dir = source_dir
@@ -76,8 +79,9 @@ class Pep517HookCaller(object):
                        cwd=self.source_dir, env=env)
 
             output_file = pjoin(td, 'output.json')
-            if os.path.isfile(output_file):
-                with io.open(output_file, encoding='utf-8') as f:
-                    return json.load(f)['return_val']
-            else:
-                return None
+            with io.open(output_file, encoding='utf-8') as f:
+                data = json.load(f)
+            if data.get('unsupported'):
+                raise UnsupportedOperation
+            return data['return_val']
+

@@ -176,10 +176,19 @@ def get_build_sdist_requires(config_settings):
     else:
         return hook(config_settings)
 
+class _DummyException(Exception):
+    """Nothing should ever raise this exception"""
+
+class GotUnsupportedOperation(Exception):
+    """For internal use when backend raises UnsupportedOperation"""
 
 def build_sdist(sdist_directory, config_settings):
     """Invoke the mandatory build_sdist hook."""
-    return _build_backend().build_sdist(sdist_directory, config_settings)
+    backend = _build_backend()
+    try:
+        return backend.build_sdist(sdist_directory, config_settings)
+    except getattr(backend, 'UnsupportedOperation', _DummyException):
+        raise GotUnsupportedOperation
 
 HOOK_NAMES = {
     'get_build_wheel_requires',
@@ -201,11 +210,15 @@ def main():
     
     with io.open(pjoin(control_dir, 'input.json'), encoding='utf-8') as f:
         hook_input = json.load(f)
-    
-    retval = hook(**hook_input['kwargs'])
+
+    json_out = {'unsupported': False, 'return_val': None}
+    try:
+        json_out['return_val'] = hook(**hook_input['kwargs'])
+    except GotUnsupportedOperation:
+        json_out['unsupported'] = True
     
     with io.open(pjoin(control_dir, 'output.json'), 'w', encoding='utf-8') as f:
-        json.dump({'return_val': retval}, f, indent=2)
+        json.dump(json_out, f, indent=2)
 
 if __name__ == '__main__':
     main()
