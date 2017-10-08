@@ -1,3 +1,4 @@
+"""Handle reading and writing JSON in UTF-8, on Python 3 and 2."""
 import json
 import sys
 
