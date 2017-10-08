@@ -1,6 +1,4 @@
 from contextlib import contextmanager
-import io
-import json
 import os
 from os.path import dirname, abspath, join as pjoin
 import pytoml
