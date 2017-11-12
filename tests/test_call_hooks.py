@@ -2,7 +2,7 @@ import os
 from os.path import dirname, abspath, join as pjoin
 import tarfile
 from testpath import modified_env, assert_isfile, assert_isdir
-from testpath.tempdir import TemporaryDirectory
+from testpath.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
 import pytest
 import zipfile
 
@@ -36,6 +36,19 @@ def test_build_wheel():
     with TemporaryDirectory() as builddir:
         with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
             whl_file = hooks.build_wheel(builddir, {})
+
+        assert whl_file.endswith('.whl')
+        assert os.sep not in whl_file
+
+        whl_file = pjoin(builddir, whl_file)
+        assert_isfile(whl_file)
+        assert zipfile.is_zipfile(whl_file)
+
+def test_build_wheel_relpath():
+    hooks = Pep517HookCaller(pjoin(SAMPLES_DIR, 'pkg1'))
+    with TemporaryWorkingDirectory() as builddir:
+        with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
+            whl_file = hooks.build_wheel('.', {})
 
         assert whl_file.endswith('.whl')
         assert os.sep not in whl_file

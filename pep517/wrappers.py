@@ -28,7 +28,7 @@ class Pep517HookCaller(object):
     source_dir : The path to the source directory, containing pyproject.toml.
     """
     def __init__(self, source_dir):
-        self.source_dir = source_dir
+        self.source_dir = abspath(source_dir)
         with open(pjoin(source_dir, 'pyproject.toml')) as f:
             self.pyproject_data = pytoml.load(f)
         buildsys = self.pyproject_data['build-system']
@@ -59,7 +59,7 @@ class Pep517HookCaller(object):
         and the dist-info extracted from that.
         """
         return self._call_hook('prepare_metadata_for_build_wheel', {
-            'metadata_directory': metadata_directory,
+            'metadata_directory': abspath(metadata_directory),
             'config_settings': config_settings,
         })
 
@@ -73,8 +73,10 @@ class Pep517HookCaller(object):
         'prepare_metadata_for_build_wheel', and the same metadata_directory is
         used, the previously built wheel will be copied to wheel_directory.
         """
+        if metadata_directory is not None:
+            metadata_directory = abspath(metadata_directory)
         return self._call_hook('build_wheel', {
-            'wheel_directory': wheel_directory,
+            'wheel_directory': abspath(wheel_directory),
             'config_settings': config_settings,
             'metadata_directory': metadata_directory,
         })
@@ -101,7 +103,7 @@ class Pep517HookCaller(object):
         This calls the 'build_sdist' backend hook in a subprocess.
         """
         return self._call_hook('build_sdist', {
-            'sdist_directory': sdist_directory,
+            'sdist_directory': abspath(sdist_directory),
             'config_settings': config_settings,
         })
 
