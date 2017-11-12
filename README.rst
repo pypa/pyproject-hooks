@@ -47,3 +47,9 @@ available:
     destination = 'also/a/folder'
     whl_filename = hooks.build_wheel(destination, config_options)
     assert os.path.isfile(os.path.join(destination, whl_filename))
+
+To test the build backend for a project, run in a system shell:
+
+.. code-block:: shell
+
+    python3 -m pep517.check path/to/source  # source dir containing pyproject.toml
