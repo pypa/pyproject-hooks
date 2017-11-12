@@ -1,0 +1,15 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "pep517"
+author = "Thomas Kluyver"
+author-email = "thomas@kluyver.me.uk"
+home-page = "https://github.com/takluyver/pep517"
+description-file = "README.rst"
+requires = [
+    "pytoml",
+]
+classifiers = ["License :: OSI Approved :: MIT License"]
+
