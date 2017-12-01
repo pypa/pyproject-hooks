@@ -78,6 +78,8 @@ class BuildEnvironment(object):
 
     def pip_install(self, reqs):
         """Install dependencies into this env by calling pip in a subprocess"""
+        if not reqs:
+            return
         log.info('Calling pip to install %s', reqs)
         check_call([sys.executable, '-m', 'pip', 'install', '--ignore-installed',
                     '--prefix', self.path] + list(reqs))
