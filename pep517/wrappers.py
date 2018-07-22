@@ -110,7 +110,19 @@ class Pep517HookCaller(object):
 
     def _call_hook(self, hook_name, kwargs):
         env = os.environ.copy()
-        env['PEP517_BUILD_BACKEND'] = self.build_backend
+
+        # On Python 2, pytoml returns Unicode values (which is correct) but the
+        # environment passed to check_call needs to contain string values. We
+        # convert here by encoding using ASCII (the backend can only contain
+        # letters, digits and _, . and : characters, and will be used as a
+        # Python identifier, so non-ASCII content is wrong on Python 2 in
+        # any case).
+        if sys.version_info[0] == 2:
+            build_backend = self.build_backend.encode('ASCII')
+        else:
+            build_backend = self.build_backend
+
+        env['PEP517_BUILD_BACKEND'] = build_backend
         with tempdir() as td:
             compat.write_json({'kwargs': kwargs}, pjoin(td, 'input.json'),
                               indent=2)
