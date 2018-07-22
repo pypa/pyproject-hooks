@@ -111,18 +111,18 @@ class Pep517HookCaller(object):
     def _call_hook(self, hook_name, kwargs):
         env = os.environ.copy()
 
-        # On Python 2, pytoml returns Unicode values (which is correct)
-        # but the environment passed to check_call needs to contain string
-        # values. We convert here by doing a default encode() which will
-        # use the system default encoding. That should do the right thing,
-        # but there is the possibility of an encoding error, as the
-        # pyproject.toml file (which is in UTF-8) can contain characters
-        # that are not encodable in the system default encoding. This is
-        # unlikely to happen, as we're talking about the build backend
-        # value, which (according to https://www.python.org/dev/peps/pep-0517/#source-trees)
-        # can only contain letters, digits and the _, ., and : characters.
+        # On Python 2, pytoml returns Unicode values (which is correct) but the
+        # environment passed to check_call needs to contain string values. We
+        # convert here by encoding with the system default encoding. That
+        # should do the right thing, but there is the possibility of an
+        # encoding error, as the pyproject.toml file (which is in UTF-8) can
+        # contain characters that are not encodable in the system default
+        # encoding. This is unlikely to happen, as we're talking about the
+        # build backend value, which (according to
+        # https://www.python.org/dev/peps/pep-0517/#source-trees) can only
+        # contain letters, digits and the _, ., and : characters.
         if sys.version_info[0] == 2:
-            build_backend = self.build_backend.encode()
+            build_backend = self.build_backend.encode(sys.getdefaultencoding())
         else:
             build_backend = self.build_backend
 
