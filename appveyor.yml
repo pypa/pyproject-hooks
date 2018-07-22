@@ -14,7 +14,7 @@ environment:
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "python --version"
-  - "pip install pytest mock testpath pytoml"
+  - "pip install tox"
 
 build: off
 
@@ -22,4 +22,4 @@ cache:
   - '%LOCALAPPDATA%\pip\Cache'
 
 test_script:
-  - "pytest"
+  - "tox -e py"
