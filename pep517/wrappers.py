@@ -113,16 +113,12 @@ class Pep517HookCaller(object):
 
         # On Python 2, pytoml returns Unicode values (which is correct) but the
         # environment passed to check_call needs to contain string values. We
-        # convert here by encoding with the system default encoding. That
-        # should do the right thing, but there is the possibility of an
-        # encoding error, as the pyproject.toml file (which is in UTF-8) can
-        # contain characters that are not encodable in the system default
-        # encoding. This is unlikely to happen, as we're talking about the
-        # build backend value, which (according to
-        # https://www.python.org/dev/peps/pep-0517/#source-trees) can only
-        # contain letters, digits and the _, ., and : characters.
+        # convert here by encoding using ASCII (the backend can only contain
+        # letters, digits and _, . and : characters, and will be used as a
+        # Python identifier, so non-ASCII content is wrong on Python 2 in
+        # any case).
         if sys.version_info[0] == 2:
-            build_backend = self.build_backend.encode(sys.getdefaultencoding())
+            build_backend = self.build_backend.encode('ASCII')
         else:
             build_backend = self.build_backend
 
