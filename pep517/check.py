@@ -4,7 +4,7 @@ import argparse
 import logging
 import os
 from os.path import isfile, join as pjoin
-from pytoml import TomlError
+from pytoml import TomlError, load as toml_load
 import shutil
 from subprocess import CalledProcessError
 import sys
@@ -130,18 +130,26 @@ def check_build_wheel(hooks):
 
 
 def check(source_dir):
-    if isfile(pjoin(source_dir, 'pyproject.toml')):
+    pyproject = pjoin(source_dir, 'pyproject.toml')
+    if isfile(pyproject):
         log.info('Found pyproject.toml')
     else:
         log.error('Missing pyproject.toml')
         return False
 
     try:
-        hooks = Pep517HookCaller(source_dir)
+        with open(pyproject) as f:
+            pyproject_data = toml_load(f)
+        # Ensure the mandatory data can be loaded
+        buildsys = pyproject_data['build-system']
+        requires = buildsys['requires']
+        backend = buildsys['build-backend']
         log.info('Loaded pyproject.toml')
     except (TomlError, KeyError):
         log.error("Invalid pyproject.toml", exc_info=True)
         return False
+
+    hooks = Pep517HookCaller(source_dir, backend)
 
     sdist_ok = check_build_sdist(hooks)
     wheel_ok = check_build_wheel(hooks)

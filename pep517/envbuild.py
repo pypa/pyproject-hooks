@@ -3,6 +3,7 @@
 
 import os
 import logging
+import pytoml
 import shutil
 from subprocess import check_call
 import sys
@@ -12,6 +13,13 @@ from tempfile import mkdtemp
 from .wrappers import Pep517HookCaller
 
 log = logging.getLogger(__name__)
+
+def _load_pyproject(source_dir):
+    with open(os.path.join(source_dir, 'pyproject.toml')) as f:
+        pyproject_data = pytoml.load(f)
+    buildsys = pyproject_data['build-system']
+    return buildsys['requires'], buildsys['build-backend']
+
 
 class BuildEnvironment(object):
     """Context manager to install build deps in a simple temporary environment
@@ -110,10 +118,11 @@ def build_wheel(source_dir, wheel_dir, config_settings=None):
     """
     if config_settings is None:
         config_settings = {}
-    hooks = Pep517HookCaller(source_dir)
+    requires, backend = _load_pyproject(source_dir)
+    hooks = Pep517HookCaller(source_dir, backend)
 
     with BuildEnvironment() as env:
-        env.pip_install(hooks.build_sys_requires)
+        env.pip_install(requires)
         reqs = hooks.get_requires_for_build_wheel(config_settings)
         env.pip_install(reqs)
         return hooks.build_wheel(wheel_dir, config_settings)
@@ -131,10 +140,11 @@ def build_sdist(source_dir, sdist_dir, config_settings=None):
     """
     if config_settings is None:
         config_settings = {}
-    hooks = Pep517HookCaller(source_dir)
+    requires, backend = _load_pyproject(source_dir)
+    hooks = Pep517HookCaller(source_dir, backend)
 
     with BuildEnvironment() as env:
-        env.pip_install(hooks.build_sys_requires)
+        env.pip_install(requires)
         reqs = hooks.get_requires_for_build_sdist(config_settings)
         env.pip_install(reqs)
         return hooks.build_sdist(sdist_dir, config_settings)
