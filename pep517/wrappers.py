@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 import os
 from os.path import dirname, abspath, join as pjoin
-import pytoml
 import shutil
 from subprocess import check_call
 import sys
@@ -26,14 +25,11 @@ class Pep517HookCaller(object):
     """A wrapper around a source directory to be built with a PEP 517 backend.
 
     source_dir : The path to the source directory, containing pyproject.toml.
+    backend : The build backend spec, as per PEP 517, from pyproject.toml.
     """
-    def __init__(self, source_dir):
+    def __init__(self, source_dir, build_backend):
         self.source_dir = abspath(source_dir)
-        with open(pjoin(source_dir, 'pyproject.toml')) as f:
-            self.pyproject_data = pytoml.load(f)
-        buildsys = self.pyproject_data['build-system']
-        self.build_sys_requires = buildsys['requires']
-        self.build_backend = buildsys['build-backend']
+        self.build_backend = build_backend
 
     def get_requires_for_build_wheel(self, config_settings):
         """Identify packages required for building a wheel
