@@ -31,7 +31,7 @@ class Pep517HookCaller(object):
         self.source_dir = abspath(source_dir)
         self.build_backend = build_backend
 
-    def get_requires_for_build_wheel(self, config_settings):
+    def get_requires_for_build_wheel(self, config_settings=None):
         """Identify packages required for building a wheel
 
         Returns a list of dependency specifications, e.g.:
@@ -45,7 +45,7 @@ class Pep517HookCaller(object):
             'config_settings': config_settings
         })
 
-    def prepare_metadata_for_build_wheel(self, metadata_directory, config_settings):
+    def prepare_metadata_for_build_wheel(self, metadata_directory, config_settings=None):
         """Prepare a *.dist-info folder with metadata for this project.
 
         Returns the name of the newly created folder.
@@ -59,7 +59,7 @@ class Pep517HookCaller(object):
             'config_settings': config_settings,
         })
 
-    def build_wheel(self, wheel_directory, config_settings, metadata_directory=None):
+    def build_wheel(self, wheel_directory, config_settings=None, metadata_directory=None):
         """Build a wheel from this project.
 
         Returns the name of the newly created file.
@@ -77,7 +77,7 @@ class Pep517HookCaller(object):
             'metadata_directory': metadata_directory,
         })
 
-    def get_requires_for_build_sdist(self, config_settings):
+    def get_requires_for_build_sdist(self, config_settings=None):
         """Identify packages required for building a wheel
 
         Returns a list of dependency specifications, e.g.:
@@ -91,7 +91,7 @@ class Pep517HookCaller(object):
             'config_settings': config_settings
         })
 
-    def build_sdist(self, sdist_directory, config_settings):
+    def build_sdist(self, sdist_directory, config_settings=None):
         """Build an sdist from this project.
 
         Returns the name of the newly created file.
