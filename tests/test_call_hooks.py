@@ -7,7 +7,8 @@ import pytest
 import pytoml
 import zipfile
 
-from pep517.wrappers import Pep517HookCaller, UnsupportedOperation
+from pep517.wrappers import Pep517HookCaller
+from pep517.wrappers import UnsupportedOperation, BackendUnavailable
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
@@ -17,6 +18,12 @@ def get_hooks(pkg):
     with open(pjoin(source_dir, 'pyproject.toml')) as f:
         data = pytoml.load(f)
     return Pep517HookCaller(source_dir, data['build-system']['build-backend'])
+
+def test_missing_backend_gives_exception():
+    hooks = get_hooks('pkg1')
+    with modified_env({'PYTHONPATH': ''}):
+        with pytest.raises(BackendUnavailable):
+            res = hooks.get_requires_for_build_wheel({})
 
 def test_get_requires_for_build_wheel():
     hooks = get_hooks('pkg1')
