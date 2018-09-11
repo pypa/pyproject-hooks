@@ -1,6 +1,7 @@
 """Build wheels/sdists by installing build deps to a temporary environment.
 """
 
+import re
 import os
 import logging
 import pytoml
@@ -14,11 +15,33 @@ from .wrappers import Pep517HookCaller
 
 log = logging.getLogger(__name__)
 
+
 def _load_pyproject(source_dir):
     with open(os.path.join(source_dir, 'pyproject.toml')) as f:
         pyproject_data = pytoml.load(f)
     buildsys = pyproject_data['build-system']
     return buildsys['requires'], buildsys['build-backend']
+
+
+REQUIREMENT_PATTERN = re.compile(r'^(?P<name>[^~><=!]+)(?P<spec>.*)$')
+
+
+def _as_req_list(reqs):
+    specs = {}
+    for req in reqs:
+        match = REQUIREMENT_PATTERN.match(req)
+        if not match:
+            specs[req] = []
+            continue
+        name, spec = match.group('name', 'spec')
+        try:
+            specs[name].append(spec)
+        except KeyError:
+            specs[name] = [spec]
+    return [
+        '{}{}'.format(name, ','.join(s for s in spec if s))
+        for name, spec in specs.items()
+    ]
 
 
 class BuildEnvironment(object):
@@ -90,7 +113,7 @@ class BuildEnvironment(object):
             return
         log.info('Calling pip to install %s', reqs)
         check_call([sys.executable, '-m', 'pip', 'install', '--ignore-installed',
-                    '--prefix', self.path] + list(reqs))
+                    '--prefix', self.path] + _as_req_list(reqs))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self._cleanup and (self.path is not None) and os.path.isdir(self.path):
