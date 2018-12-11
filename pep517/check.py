@@ -18,6 +18,7 @@ from .wrappers import Pep517HookCaller
 
 log = logging.getLogger(__name__)
 
+
 def check_build_sdist(hooks, build_sys_requires):
     with BuildEnvironment() as env:
         try:
@@ -30,7 +31,7 @@ def check_build_sdist(hooks, build_sys_requires):
         try:
             reqs = hooks.get_requires_for_build_sdist({})
             log.info('Got build requires: %s', reqs)
-        except:
+        except Exception:
             log.error('Failure in get_requires_for_build_sdist', exc_info=True)
             return False
 
@@ -47,12 +48,13 @@ def check_build_sdist(hooks, build_sys_requires):
             try:
                 filename = hooks.build_sdist(td, {})
                 log.info('build_sdist returned %r', filename)
-            except:
+            except Exception:
                 log.info('Failure in build_sdist', exc_info=True)
                 return False
 
             if not filename.endswith('.tar.gz'):
-                log.error("Filename %s doesn't have .tar.gz extension", filename)
+                log.error(
+                    "Filename %s doesn't have .tar.gz extension", filename)
                 return False
 
             path = pjoin(td, filename)
@@ -73,6 +75,7 @@ def check_build_sdist(hooks, build_sys_requires):
 
         return True
 
+
 def check_build_wheel(hooks, build_sys_requires):
     with BuildEnvironment() as env:
         try:
@@ -85,7 +88,7 @@ def check_build_wheel(hooks, build_sys_requires):
         try:
             reqs = hooks.get_requires_for_build_wheel({})
             log.info('Got build requires: %s', reqs)
-        except:
+        except Exception:
             log.error('Failure in get_requires_for_build_sdist', exc_info=True)
             return False
 
@@ -102,7 +105,7 @@ def check_build_wheel(hooks, build_sys_requires):
             try:
                 filename = hooks.build_wheel(td, {})
                 log.info('build_wheel returned %r', filename)
-            except:
+            except Exception:
                 log.info('Failure in build_wheel', exc_info=True)
                 return False
 
@@ -164,7 +167,8 @@ def check(source_dir):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument('source_dir',
+    ap.add_argument(
+        'source_dir',
         help="A directory containing pyproject.toml")
     args = ap.parse_args(argv)
 
@@ -178,17 +182,21 @@ def main(argv=None):
         print(ansi('Checks failed', 'red'))
         sys.exit(1)
 
+
 ansi_codes = {
     'reset': '\x1b[0m',
     'bold': '\x1b[1m',
     'red': '\x1b[31m',
     'green': '\x1b[32m',
 }
+
+
 def ansi(s, attr):
     if os.name != 'nt' and sys.stdout.isatty():
         return ansi_codes[attr] + str(s) + ansi_codes['reset']
     else:
         return str(s)
+
 
 if __name__ == '__main__':
     main()
