@@ -18,10 +18,10 @@ from .wrappers import Pep517HookCaller
 
 log = logging.getLogger(__name__)
 
-def check_build_sdist(hooks):
+def check_build_sdist(hooks, build_sys_requires):
     with BuildEnvironment() as env:
         try:
-            env.pip_install(hooks.build_sys_requires)
+            env.pip_install(build_sys_requires)
             log.info('Installed static build dependencies')
         except CalledProcessError:
             log.error('Failed to install static build dependencies')
@@ -73,10 +73,10 @@ def check_build_sdist(hooks):
 
         return True
 
-def check_build_wheel(hooks):
+def check_build_wheel(hooks, build_sys_requires):
     with BuildEnvironment() as env:
         try:
-            env.pip_install(hooks.build_sys_requires)
+            env.pip_install(build_sys_requires)
             log.info('Installed static build dependencies')
         except CalledProcessError:
             log.error('Failed to install static build dependencies')
@@ -151,8 +151,8 @@ def check(source_dir):
 
     hooks = Pep517HookCaller(source_dir, backend)
 
-    sdist_ok = check_build_sdist(hooks)
-    wheel_ok = check_build_wheel(hooks)
+    sdist_ok = check_build_sdist(hooks, requires)
+    wheel_ok = check_build_wheel(hooks, requires)
 
     if not sdist_ok:
         log.warning('Sdist checks failed; scroll up to see')
