@@ -72,24 +72,24 @@ def build(source_dir, dist):
         _do_build(hooks, env, dist, dest)
 
 
-def main(argv=None):
-    ap = argparse.ArgumentParser()
-    ap.add_argument(
-        'source_dir',
-        help="A directory containing pyproject.toml",
-    )
-    ap.add_argument(
-        '--binary',
-        action='store_true',
-        default=False,
-    )
-    ap.add_argument(
-        '--source',
-        action='store_true',
-        default=False,
-    )
-    args = ap.parse_args(argv)
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    'source_dir',
+    help="A directory containing pyproject.toml",
+)
+parser.add_argument(
+    '--binary',
+    action='store_true',
+    default=False,
+)
+parser.add_argument(
+    '--source',
+    action='store_true',
+    default=False,
+)
 
+
+def main(args):
     # determine which dists to build
     dists = list(filter(None, (
         'sdist' if args.source or not args.binary else None,
@@ -101,4 +101,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    main()
+    main(parser.parse_args())
