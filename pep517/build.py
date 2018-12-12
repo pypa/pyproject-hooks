@@ -78,12 +78,12 @@ parser.add_argument(
     help="A directory containing pyproject.toml",
 )
 parser.add_argument(
-    '--binary',
+    '--binary', '-b',
     action='store_true',
     default=False,
 )
 parser.add_argument(
-    '--source',
+    '--source', '-s',
     action='store_true',
     default=False,
 )
