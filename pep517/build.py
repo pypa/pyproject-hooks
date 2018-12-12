@@ -53,9 +53,9 @@ def mkdir_p(*args, **kwargs):
             raise
 
 
-def build(source_dir, dist):
+def build(source_dir, dist, dest=None):
     pyproject = os.path.join(source_dir, 'pyproject.toml')
-    dest = os.path.join(source_dir, 'dist')
+    dest = os.path.join(source_dir, dest or 'dist')
     mkdir_p(dest)
 
     with open(pyproject) as f:
@@ -87,6 +87,10 @@ parser.add_argument(
     action='store_true',
     default=False,
 )
+parser.add_argument(
+    '--out-dir', '-o',
+    help="Destination in which to save the builds relative to source dir",
+)
 
 
 def main(args):
@@ -97,7 +101,7 @@ def main(args):
     )))
 
     for dist in dists:
-        build(args.source_dir, dist)
+        build(args.source_dir, dist, args.out_dir)
 
 
 if __name__ == '__main__':
