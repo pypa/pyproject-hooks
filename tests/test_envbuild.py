@@ -13,6 +13,7 @@ from pep517.envbuild import build_sdist, build_wheel, BuildEnvironment
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
 
+
 @patch.object(BuildEnvironment, 'pip_install')
 def test_build_wheel(mock_pip_install):
     with modified_env({'PYTHONPATH': BUILDSYS_PKGS}), \
@@ -24,6 +25,7 @@ def test_build_wheel(mock_pip_install):
     assert mock_pip_install.call_count == 2
     assert mock_pip_install.call_args_list[0] == call(['eg_buildsys'])
     assert mock_pip_install.call_args_list[1] == call(['wheelwright'])
+
 
 @patch.object(BuildEnvironment, 'pip_install')
 def test_build_sdist(mock_pip_install):
