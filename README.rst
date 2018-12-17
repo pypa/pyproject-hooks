@@ -53,3 +53,13 @@ To test the build backend for a project, run in a system shell:
 .. code-block:: shell
 
     python3 -m pep517.check path/to/source  # source dir containing pyproject.toml
+
+To build a backend into source and/or binary distributions, run in a shell:
+
+.. code-block:: shell
+
+    python -m pep517.build path/to/source  # source dir containing pyproject.toml
+
+This 'build' module should be considered experimental while the PyPA `decides
+on the best place for this functionality
+<https://github.com/pypa/packaging-problems/issues/219>`_.
