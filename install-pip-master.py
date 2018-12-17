@@ -8,14 +8,14 @@ import sys
 
 
 def main():
-	cmd = [
-		sys.executable,
-		'-m', 'pip', 'install',
-		'git+https://github.com/pypa/pip',
-	]
-	subprocess.run(cmd)
-	cmd[-1:] = sys.argv[1:]
-	subprocess.run(cmd)
+    cmd = [
+        sys.executable,
+        '-m', 'pip', 'install',
+        'git+https://github.com/pypa/pip',
+    ]
+    subprocess.run(cmd)
+    cmd[-1:] = sys.argv[1:]
+    subprocess.run(cmd)
 
 
 __name__ == '__main__' and main()
