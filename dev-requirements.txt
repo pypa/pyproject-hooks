@@ -1,4 +1,5 @@
 pytest
+pytest-flake8
 mock
 testpath
 pytoml

@@ -9,12 +9,15 @@ import shutil
 import tarfile
 from zipfile import ZipFile
 
+
 def get_requires_for_build_wheel(config_settings):
     return ['wheelwright']
+
 
 def prepare_metadata_for_build_wheel(metadata_directory, config_settings):
     for distinfo in glob('*.dist-info'):
         shutil.copytree(distinfo, pjoin(metadata_directory, distinfo))
+
 
 def prepare_build_wheel_files(build_directory, config_settings):
     shutil.copy('pyproject.toml', build_directory)
@@ -22,6 +25,7 @@ def prepare_build_wheel_files(build_directory, config_settings):
         shutil.copy(pyfile, build_directory)
     for distinfo in glob('*.dist-info'):
         shutil.copytree(distinfo, pjoin(build_directory, distinfo))
+
 
 def build_wheel(wheel_directory, config_settings, metadata_directory=None):
     whl_file = 'pkg1-0.5-py2.py3-none-any.whl'
@@ -32,11 +36,14 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
             zf.write(metadata)
     return whl_file
 
+
 def get_requires_for_build_sdist(config_settings):
     return ['frog']
 
+
 class UnsupportedOperation(Exception):
     pass
+
 
 def build_sdist(sdist_directory, config_settings):
     if config_settings.get('test_unsupported', False):

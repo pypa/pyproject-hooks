@@ -7,6 +7,7 @@ from os.path import join as pjoin
 import tarfile
 from zipfile import ZipFile
 
+
 def build_wheel(wheel_directory, config_settings, metadata_directory=None):
     whl_file = 'pkg2-0.5-py2.py3-none-any.whl'
     with ZipFile(pjoin(wheel_directory, whl_file), 'w') as zf:
@@ -15,6 +16,7 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
         for metadata in glob('*.dist-info/*'):
             zf.write(metadata)
     return whl_file
+
 
 def build_sdist(sdist_directory, config_settings):
     target = 'pkg2-0.5.tar.gz'
