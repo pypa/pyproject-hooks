@@ -1,3 +1,5 @@
+dist: xenial
+sudo: false
 language: python
 
 python:
@@ -24,7 +26,9 @@ jobs:
     - TOXENV=release
     script: tox
 
+cache: pip
+
 install:
-- pip install tox
+- pip install tox tox-venv
 
 script: tox
