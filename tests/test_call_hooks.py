@@ -103,3 +103,13 @@ def test_build_sdist_unsupported():
         with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
             with pytest.raises(UnsupportedOperation):
                 hooks.build_sdist(sdistdir, {'test_unsupported': True})
+
+
+def test_bootstrap_backend():
+    hooks = get_hooks('bootstrap_pkg')
+    with modified_env({'PYTHONPATH': ''}):
+        wheel_reqs = hooks.get_requires_for_build_wheel({})
+        assert wheel_reqs == ['wheel', 'sentinel']
+
+        sdist_reqs = hooks.get_requires_for_build_sdist({})
+        assert sdist_reqs == ['sdist_sentinel']

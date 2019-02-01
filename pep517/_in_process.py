@@ -29,12 +29,25 @@ class BackendUnavailable(Exception):
         self.traceback = traceback
 
 
+def _backend_importer(mod_path):
+    if mod_path == '<bootstrap-backend>':
+        sys.path.insert(0, '')
+        mod = import_module('__bootstrap_backend__')
+        sys.path[:] = sys.path[1:]
+    else:
+        mod = import_module(mod_path)
+
+    return mod
+
+
 def _build_backend():
     """Find and load the build backend"""
     ep = os.environ['PEP517_BUILD_BACKEND']
+
     mod_path, _, obj_path = ep.partition(':')
+
     try:
-        obj = import_module(mod_path)
+        obj = _backend_importer(mod_path)
     except ImportError:
         raise BackendUnavailable(traceback.format_exc())
     if obj_path:
