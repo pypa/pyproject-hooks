@@ -1,0 +1,4 @@
+[build-system]
+requires=[]
+build-backend="mybackend"
+bootstrap-backend-location="."
