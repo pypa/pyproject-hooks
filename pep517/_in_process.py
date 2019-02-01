@@ -33,10 +33,18 @@ def _build_backend():
     """Find and load the build backend"""
     ep = os.environ['PEP517_BUILD_BACKEND']
     mod_path, _, obj_path = ep.partition(':')
+    backend_locn = os.environ.get('PEP517_BACKEND_LOCN', None)
+    if backend_locn is not None:
+        sys.path.insert(0, backend_locn)
+
     try:
         obj = import_module(mod_path)
     except ImportError:
         raise BackendUnavailable(traceback.format_exc())
+    finally:
+        if backend_locn is not None:
+            sys.path.pop(0)
+
     if obj_path:
         for path_part in obj_path.split('.'):
             obj = getattr(obj, path_part)

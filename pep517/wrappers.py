@@ -47,9 +47,10 @@ class Pep517HookCaller(object):
     source_dir : The path to the source directory, containing pyproject.toml.
     backend : The build backend spec, as per PEP 517, from pyproject.toml.
     """
-    def __init__(self, source_dir, build_backend):
+    def __init__(self, source_dir, build_backend, bootstrap_backend_locn=None):
         self.source_dir = abspath(source_dir)
         self.build_backend = build_backend
+        self.bootstrap_backend_locn = bootstrap_backend_locn
         self._subprocess_runner = default_subprocess_runner
 
     # TODO: Is this over-engineered? Maybe frontends only need to
@@ -137,6 +138,10 @@ class Pep517HookCaller(object):
         })
 
     def _call_hook(self, hook_name, kwargs):
+        envvars = {'PEP517_BUILD_BACKEND': self.build_backend}
+        if self.bootstrap_backend_locn is not None:
+            envvars['PEP517_BACKEND_LOCN'] = self.bootstrap_backend_locn
+
         # On Python 2, pytoml returns Unicode values (which is correct) but the
         # environment passed to check_call needs to contain string values. We
         # convert here by encoding using ASCII (the backend can only contain
@@ -144,9 +149,7 @@ class Pep517HookCaller(object):
         # Python identifier, so non-ASCII content is wrong on Python 2 in
         # any case).
         if sys.version_info[0] == 2:
-            build_backend = self.build_backend.encode('ASCII')
-        else:
-            build_backend = self.build_backend
+            envvars = {k: v.encode('ASCII') for (k, v) in envvars.items()}
 
         with tempdir() as td:
             compat.write_json({'kwargs': kwargs}, pjoin(td, 'input.json'),
@@ -156,7 +159,7 @@ class Pep517HookCaller(object):
             self._subprocess_runner(
                 [sys.executable, _in_proc_script, hook_name, td],
                 cwd=self.source_dir,
-                extra_environ={'PEP517_BUILD_BACKEND': build_backend}
+                extra_environ=envvars,
             )
 
             data = compat.read_json(pjoin(td, 'output.json'))

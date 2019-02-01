@@ -18,7 +18,11 @@ def get_hooks(pkg):
     source_dir = pjoin(SAMPLES_DIR, pkg)
     with open(pjoin(source_dir, 'pyproject.toml')) as f:
         data = pytoml.load(f)
-    return Pep517HookCaller(source_dir, data['build-system']['build-backend'])
+    buildsys = data['build-system']
+    return Pep517HookCaller(
+        source_dir, buildsys['build-backend'],
+        bootstrap_backend_locn=buildsys.get('bootstrap-backend-location')
+    )
 
 
 def test_missing_backend_gives_exception():
