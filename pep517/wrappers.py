@@ -22,10 +22,14 @@ def tempdir():
 
 class BackendUnavailable(Exception):
     """Will be raised if the backend cannot be imported in the hook process."""
+    def __init__(self, traceback):
+        self.traceback = traceback
 
 
 class UnsupportedOperation(Exception):
     """May be raised by build_sdist if the backend indicates that it can't."""
+    def __init__(self, traceback):
+        self.traceback = traceback
 
 
 def default_subprocess_runner(cmd, cwd=None, extra_environ=None):
@@ -157,7 +161,7 @@ class Pep517HookCaller(object):
 
             data = compat.read_json(pjoin(td, 'output.json'))
             if data.get('unsupported'):
-                raise UnsupportedOperation
+                raise UnsupportedOperation(data.get('traceback', ''))
             if data.get('no_backend'):
-                raise BackendUnavailable
+                raise BackendUnavailable(data.get('traceback', ''))
             return data['return_val']
