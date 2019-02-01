@@ -34,11 +34,16 @@ available:
 .. code-block:: python
 
     import os
+    import pytoml
     from pep517.wrappers import Pep517HookCaller
 
     src = 'path/to/source'  # Folder containing 'pyproject.toml'
-    hooks = Pep517HookCaller(src)
-    print(hooks.build_sys_requires)  # List of static requirements
+    with open(os.path.join(src, 'pyproject.toml')) as f:
+        build_sys = pytoml.load(f)['build-system']
+
+    print(build_sys['requires'])  # List of static requirements
+
+    hooks = Pep517HookCaller(src, build_backend=build_sys['build_backend'])
 
     config_options = {}   # Optional parameters for backend
     # List of dynamic requirements:
