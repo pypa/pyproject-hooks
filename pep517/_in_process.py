@@ -17,6 +17,7 @@ from os.path import join as pjoin
 import re
 import shutil
 import sys
+import traceback
 
 # This is run as a script, not a module, so it can't do a relative import
 import compat
@@ -24,6 +25,8 @@ import compat
 
 class BackendUnavailable(Exception):
     """Raised if we cannot import the backend"""
+    def __init__(self, traceback):
+        self.traceback = traceback
 
 
 def _build_backend():
@@ -33,7 +36,7 @@ def _build_backend():
     try:
         obj = import_module(mod_path)
     except ImportError:
-        raise BackendUnavailable
+        raise BackendUnavailable(traceback.format_exc())
     if obj_path:
         for path_part in obj_path.split('.'):
             obj = getattr(obj, path_part)
@@ -161,6 +164,8 @@ class _DummyException(Exception):
 
 class GotUnsupportedOperation(Exception):
     """For internal use when backend raises UnsupportedOperation"""
+    def __init__(self, traceback):
+        self.traceback = traceback
 
 
 def build_sdist(sdist_directory, config_settings):
@@ -169,7 +174,7 @@ def build_sdist(sdist_directory, config_settings):
     try:
         return backend.build_sdist(sdist_directory, config_settings)
     except getattr(backend, 'UnsupportedOperation', _DummyException):
-        raise GotUnsupportedOperation
+        raise GotUnsupportedOperation(traceback.format_exc())
 
 
 HOOK_NAMES = {
@@ -195,10 +200,12 @@ def main():
     json_out = {'unsupported': False, 'return_val': None}
     try:
         json_out['return_val'] = hook(**hook_input['kwargs'])
-    except BackendUnavailable:
+    except BackendUnavailable as e:
         json_out['no_backend'] = True
-    except GotUnsupportedOperation:
+        json_out['traceback'] = e.traceback
+    except GotUnsupportedOperation as e:
         json_out['unsupported'] = True
+        json_out['traceback'] = e.traceback
 
     compat.write_json(json_out, pjoin(control_dir, 'output.json'), indent=2)
 
