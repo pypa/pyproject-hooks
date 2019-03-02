@@ -1,3 +1,6 @@
+PEP517
+======
+
 `PEP 517 <https://www.python.org/dev/peps/pep-0517/>`_ specifies a standard
 API for systems which build Python packages.
 
@@ -12,6 +15,9 @@ provides:
   temporary environment and build a wheel/sdist using them.
 
 Run the tests with ``py.test``.
+
+Building a wheel or sdist
+-------------------------
 
 High level usage, with build requirements handled:
 
@@ -52,6 +58,38 @@ available:
     destination = 'also/a/folder'
     whl_filename = hooks.build_wheel(destination, config_options)
     assert os.path.isfile(os.path.join(destination, whl_filename))
+
+
+Extract metadata
+----------------
+
+PEP517 contains highlevel wrappers to extract various metadata.
+
+.. code-block:: python
+
+   # Getting package name from pip reference:
+
+   from pep517.metadata import get_package_name
+   print(get_package_name("pillow"))
+   # Outputs: "Pillow" (note the spelling!)
+
+
+   # Getting package dependencies:
+
+   from pep517.metadata import get_package_dependencies
+   print(get_package_dependencies("pep517"))
+   # Outputs: "['pytoml']"
+
+
+   # Get package name from arbitrary package source:
+
+   from pep517.metadata import get_package_name
+   print(get_package_name("/some/local/project/folder/"))
+   # Outputs package name
+
+
+Build backend tests and more
+----------------------------
 
 To test the build backend for a project, run in a system shell:
 
