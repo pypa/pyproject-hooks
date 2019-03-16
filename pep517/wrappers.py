@@ -26,6 +26,14 @@ class BackendUnavailable(Exception):
         self.traceback = traceback
 
 
+class BackendInvalid(Exception):
+    """Will be raised if the backend is invalid."""
+    def __init__(self, backend_name, backend_path, message):
+        self.backend_name = backend_name
+        self.backend_path = backend_path
+        self.message = message
+
+
 class UnsupportedOperation(Exception):
     """May be raised by build_sdist if the backend indicates that it can't."""
     def __init__(self, traceback):
@@ -41,15 +49,45 @@ def default_subprocess_runner(cmd, cwd=None, extra_environ=None):
     check_call(cmd, cwd=cwd, env=env)
 
 
+def norm_and_check(source_tree, requested):
+    """Normalise and check a backend path.
+
+    Ensure that the requested backend path is specified as a relative path,
+    and resolves to a location under the given source tree.
+
+    Return an absolute version of the requested path.
+    """
+    if os.path.isabs(requested):
+        raise ValueError("paths must be relative")
+
+    abs_source = os.path.abspath(source_tree)
+    abs_requested = os.path.abspath(os.path.join(abs_source, requested))
+    # We have to use commonprefix for Python 2.7 compatibility. So we
+    # normalise case to avoid problems because commonprefix is a character
+    # based comparison :-(
+    norm_source = os.path.normcase(abs_source)
+    norm_requested = os.path.normcase(abs_requested)
+    if os.path.commonprefix([norm_source, norm_requested]) != norm_source:
+        raise ValueError("paths must be inside source tree")
+
+    return abs_requested
+
+
 class Pep517HookCaller(object):
     """A wrapper around a source directory to be built with a PEP 517 backend.
 
     source_dir : The path to the source directory, containing pyproject.toml.
     backend : The build backend spec, as per PEP 517, from pyproject.toml.
+    backend_path : The backend path, as per PEP 517, from pyproject.toml.
     """
-    def __init__(self, source_dir, build_backend):
+    def __init__(self, source_dir, build_backend, backend_path=None):
         self.source_dir = abspath(source_dir)
         self.build_backend = build_backend
+        if backend_path:
+            backend_path = [
+                norm_and_check(self.source_dir, p) for p in backend_path
+            ]
+        self.backend_path = backend_path
         self._subprocess_runner = default_subprocess_runner
 
     # TODO: Is this over-engineered? Maybe frontends only need to
@@ -149,7 +187,8 @@ class Pep517HookCaller(object):
             build_backend = self.build_backend
 
         with tempdir() as td:
-            compat.write_json({'kwargs': kwargs}, pjoin(td, 'input.json'),
+            hook_input = {'kwargs': kwargs, 'backend_path': self.backend_path}
+            compat.write_json(hook_input, pjoin(td, 'input.json'),
                               indent=2)
 
             # Run the hook in a subprocess
@@ -164,4 +203,10 @@ class Pep517HookCaller(object):
                 raise UnsupportedOperation(data.get('traceback', ''))
             if data.get('no_backend'):
                 raise BackendUnavailable(data.get('traceback', ''))
+            if data.get('backend_invalid'):
+                raise BackendInvalid(
+                    backend_name=self.build_backend,
+                    backend_path=self.backend_path,
+                    message=data.get('backend_error', '')
+                )
             return data['return_val']

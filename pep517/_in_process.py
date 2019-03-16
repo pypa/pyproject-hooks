@@ -13,6 +13,7 @@ Results:
 from glob import glob
 from importlib import import_module
 import os
+import os.path
 from os.path import join as pjoin
 import re
 import shutil
@@ -29,6 +30,23 @@ class BackendUnavailable(Exception):
         self.traceback = traceback
 
 
+class BackendInvalid(Exception):
+    """Raised if we cannot import the backend"""
+    def __init__(self, message):
+        self.message = message
+
+
+def contained_in(filename, directory):
+    """Test if a file is located within the given directory."""
+    filename = os.path.normcase(os.path.abspath(filename))
+    directory = os.path.normcase(os.path.abspath(directory))
+    return os.path.commonprefix([filename, directory]) == directory
+
+
+# The list of backend paths specified in pyproject.toml
+extra_path = None
+
+
 def _build_backend():
     """Find and load the build backend"""
     ep = os.environ['PEP517_BUILD_BACKEND']
@@ -37,6 +55,14 @@ def _build_backend():
         obj = import_module(mod_path)
     except ImportError:
         raise BackendUnavailable(traceback.format_exc())
+
+    if extra_path:
+        for path in extra_path:
+            if contained_in(obj.__file__, path):
+                break
+        else:
+            raise BackendInvalid("Backend was not loaded from backend-path")
+
     if obj_path:
         for path_part in obj_path.split('.'):
             obj = getattr(obj, path_part)
@@ -197,12 +223,23 @@ def main():
 
     hook_input = compat.read_json(pjoin(control_dir, 'input.json'))
 
+    # Add in-tree backend directories to the front of sys.path.
+    # The variable extra_path is global so that it can be used within
+    #  _build_backend.
+    global extra_path
+    extra_path = hook_input.get('backend_path')
+    if extra_path:
+        sys.path[:0] = extra_path
+
     json_out = {'unsupported': False, 'return_val': None}
     try:
         json_out['return_val'] = hook(**hook_input['kwargs'])
     except BackendUnavailable as e:
         json_out['no_backend'] = True
         json_out['traceback'] = e.traceback
+    except BackendInvalid as e:
+        json_out['backend_invalid'] = True
+        json_out['backend_error'] = e.message
     except GotUnsupportedOperation as e:
         json_out['unsupported'] = True
         json_out['traceback'] = e.traceback
