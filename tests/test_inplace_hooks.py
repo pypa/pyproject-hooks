@@ -39,7 +39,7 @@ def test_intree_backend():
     hooks = get_hooks('pkg_intree')
     with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
         res = hooks.get_requires_for_build_sdist({})
-    assert res == []
+    assert res == ["intree_backend_called"]
 
 
 def test_intree_backend_not_in_path():

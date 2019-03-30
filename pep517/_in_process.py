@@ -33,7 +33,7 @@ class BackendUnavailable(Exception):
 
 
 class BackendInvalid(Exception):
-    """Raised if we cannot import the backend"""
+    """Raised if the backend is invalid"""
     def __init__(self, message):
         self.message = message
 
@@ -56,10 +56,10 @@ def _build_backend():
 
     backend_path = os.environ.get('PEP517_BACKEND_PATH')
     if backend_path:
-        for path in backend_path.split(os.pathsep):
-            if contained_in(obj.__file__, path):
-                break
-        else:
+        if not any(
+            contained_in(obj.__file__, path)
+            for path in backend_path.split(os.pathsep)
+        ):
             raise BackendInvalid("Backend was not loaded from backend-path")
 
     if obj_path:

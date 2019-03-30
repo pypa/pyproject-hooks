@@ -61,7 +61,7 @@ def norm_and_check(source_tree, requested):
         raise ValueError("paths must be relative")
 
     abs_source = os.path.abspath(source_tree)
-    abs_requested = os.path.abspath(os.path.join(abs_source, requested))
+    abs_requested = os.path.normpath(os.path.join(abs_source, requested))
     # We have to use commonprefix for Python 2.7 compatibility. So we
     # normalise case to avoid problems because commonprefix is a character
     # based comparison :-(
