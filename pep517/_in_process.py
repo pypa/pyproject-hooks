@@ -2,7 +2,9 @@
 
 It expects:
 - Command line args: hook_name, control_dir
-- Environment variable: PEP517_BUILD_BACKEND=entry.point:spec
+- Environment variables:
+      PEP517_BUILD_BACKEND=entry.point:spec
+      PEP517_BACKEND_PATH=paths (separated with os.pathsep)
 - control_dir/input.json:
   - {"kwargs": {...}}
 
@@ -43,10 +45,6 @@ def contained_in(filename, directory):
     return os.path.commonprefix([filename, directory]) == directory
 
 
-# The list of backend paths specified in pyproject.toml
-extra_path = None
-
-
 def _build_backend():
     """Find and load the build backend"""
     ep = os.environ['PEP517_BUILD_BACKEND']
@@ -56,8 +54,9 @@ def _build_backend():
     except ImportError:
         raise BackendUnavailable(traceback.format_exc())
 
-    if extra_path:
-        for path in extra_path:
+    backend_path = os.environ.get('PEP517_BACKEND_PATH')
+    if backend_path:
+        for path in backend_path.split(os.pathsep):
             if contained_in(obj.__file__, path):
                 break
         else:
@@ -224,12 +223,9 @@ def main():
     hook_input = compat.read_json(pjoin(control_dir, 'input.json'))
 
     # Add in-tree backend directories to the front of sys.path.
-    # The variable extra_path is global so that it can be used within
-    #  _build_backend.
-    global extra_path
-    extra_path = hook_input.get('backend_path')
-    if extra_path:
-        sys.path[:0] = extra_path
+    backend_path = os.environ.get('PEP517_BACKEND_PATH')
+    if backend_path:
+        sys.path[:0] = backend_path.split(os.pathsep)
 
     json_out = {'unsupported': False, 'return_val': None}
     try:
