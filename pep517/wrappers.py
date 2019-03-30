@@ -182,12 +182,17 @@ class Pep517HookCaller(object):
         # Python identifier, so non-ASCII content is wrong on Python 2 in
         # any case).
         # For backend_path, we use sys.getfilesystemencoding.
-        backend_path = os.pathsep.join(self.backend_path)
         if sys.version_info[0] == 2:
             build_backend = self.build_backend.encode('ASCII')
-            backend_path = backend_path.encode(sys.getfilesystemencoding())
         else:
             build_backend = self.build_backend
+        extra_environ = {'PEP517_BUILD_BACKEND': build_backend}
+
+        if self.backend_path:
+            backend_path = os.pathsep.join(self.backend_path)
+            if sys.version_info[0] == 2:
+                backend_path = backend_path.encode(sys.getfilesystemencoding())
+            extra_environ['PEP517_BACKEND_PATH'] = backend_path
 
         with tempdir() as td:
             hook_input = {'kwargs': kwargs}
@@ -198,10 +203,7 @@ class Pep517HookCaller(object):
             self._subprocess_runner(
                 [sys.executable, _in_proc_script, hook_name, td],
                 cwd=self.source_dir,
-                extra_environ={
-                    'PEP517_BUILD_BACKEND': build_backend,
-                    'PEP517_BACKEND_PATH': backend_path
-                }
+                extra_environ=extra_environ
             )
 
             data = compat.read_json(pjoin(td, 'output.json'))
