@@ -47,6 +47,12 @@ def contained_in(filename, directory):
 
 def _build_backend():
     """Find and load the build backend"""
+    # Add in-tree backend directories to the front of sys.path.
+    backend_path = os.environ.get('PEP517_BACKEND_PATH')
+    if backend_path:
+        extra_pathitems = backend_path.split(os.pathsep)
+        sys.path[:0] = extra_pathitems
+
     ep = os.environ['PEP517_BUILD_BACKEND']
     mod_path, _, obj_path = ep.partition(':')
     try:
@@ -54,11 +60,10 @@ def _build_backend():
     except ImportError:
         raise BackendUnavailable(traceback.format_exc())
 
-    backend_path = os.environ.get('PEP517_BACKEND_PATH')
     if backend_path:
         if not any(
             contained_in(obj.__file__, path)
-            for path in backend_path.split(os.pathsep)
+            for path in extra_pathitems
         ):
             raise BackendInvalid("Backend was not loaded from backend-path")
 
@@ -221,11 +226,6 @@ def main():
     hook = globals()[hook_name]
 
     hook_input = compat.read_json(pjoin(control_dir, 'input.json'))
-
-    # Add in-tree backend directories to the front of sys.path.
-    backend_path = os.environ.get('PEP517_BACKEND_PATH')
-    if backend_path:
-        sys.path[:0] = backend_path.split(os.pathsep)
 
     json_out = {'unsupported': False, 'return_val': None}
     try:
