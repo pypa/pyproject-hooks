@@ -2,7 +2,9 @@
 
 It expects:
 - Command line args: hook_name, control_dir
-- Environment variable: PEP517_BUILD_BACKEND=entry.point:spec
+- Environment variables:
+      PEP517_BUILD_BACKEND=entry.point:spec
+      PEP517_BACKEND_PATH=paths (separated with os.pathsep)
 - control_dir/input.json:
   - {"kwargs": {...}}
 
@@ -13,6 +15,7 @@ Results:
 from glob import glob
 from importlib import import_module
 import os
+import os.path
 from os.path import join as pjoin
 import re
 import shutil
@@ -29,14 +32,41 @@ class BackendUnavailable(Exception):
         self.traceback = traceback
 
 
+class BackendInvalid(Exception):
+    """Raised if the backend is invalid"""
+    def __init__(self, message):
+        self.message = message
+
+
+def contained_in(filename, directory):
+    """Test if a file is located within the given directory."""
+    filename = os.path.normcase(os.path.abspath(filename))
+    directory = os.path.normcase(os.path.abspath(directory))
+    return os.path.commonprefix([filename, directory]) == directory
+
+
 def _build_backend():
     """Find and load the build backend"""
+    # Add in-tree backend directories to the front of sys.path.
+    backend_path = os.environ.get('PEP517_BACKEND_PATH')
+    if backend_path:
+        extra_pathitems = backend_path.split(os.pathsep)
+        sys.path[:0] = extra_pathitems
+
     ep = os.environ['PEP517_BUILD_BACKEND']
     mod_path, _, obj_path = ep.partition(':')
     try:
         obj = import_module(mod_path)
     except ImportError:
         raise BackendUnavailable(traceback.format_exc())
+
+    if backend_path:
+        if not any(
+            contained_in(obj.__file__, path)
+            for path in extra_pathitems
+        ):
+            raise BackendInvalid("Backend was not loaded from backend-path")
+
     if obj_path:
         for path_part in obj_path.split('.'):
             obj = getattr(obj, path_part)
@@ -203,6 +233,9 @@ def main():
     except BackendUnavailable as e:
         json_out['no_backend'] = True
         json_out['traceback'] = e.traceback
+    except BackendInvalid as e:
+        json_out['backend_invalid'] = True
+        json_out['backend_error'] = e.message
     except GotUnsupportedOperation as e:
         json_out['unsupported'] = True
         json_out['traceback'] = e.traceback
