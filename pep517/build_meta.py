@@ -3,11 +3,13 @@
 import argparse
 import logging
 import os
+import io
 import contextlib
 import pytoml
 import shutil
 import errno
 import tempfile
+import zipfile
 
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
@@ -66,6 +68,26 @@ def build_meta(source_dir, dest=None):
     with BuildEnvironment() as env:
         env.pip_install(requires)
         _prep_meta(hooks, env, dest)
+
+
+def dir_to_zipfile(root):
+    buffer = io.BytesIO()
+    zip_file = zipfile.ZipFile(buffer, 'w')
+    for root, dirs, files in os.walk(root):
+        for path in dirs:
+            fs_path = os.path.join(root, path)
+            rel_path = os.path.relpath(fs_path, root)
+            zip_file.writestr(rel_path + '/', '')
+        for path in files:
+            fs_path = os.path.join(root, path)
+            rel_path = os.path.relpath(fs_path, root)
+            zip_file.write(fs_path, rel_path)
+
+
+def build_meta_as_zip(source_dir='.'):
+    with tempdir() as out_dir:
+        build_meta(source_dir, out_dir)
+        return dir_to_zipfile(out_dir)
 
 
 parser = argparse.ArgumentParser()
