@@ -51,12 +51,19 @@ def mkdir_p(*args, **kwargs):
             raise
 
 
+def validate_build_system(system):
+    required = {'requires', 'backend'}
+    if required > set(system):
+        missing = required - set(system)
+        message = "Missing required fields: {missing}".format(**locals())
+        raise ValueError(message)
+
+
 def build_meta(source_dir='.', dest=None, build_system=None):
-    build_system |= load_build_system(source_dir)
+    build_system = build_system or load_build_system(source_dir)
     dest = os.path.join(source_dir, dest or 'dist')
     mkdir_p(dest)
-    # ensure 'requires' is present
-    build_system['requires']
+    validate_build_system(build_system)
     hooks = Pep517HookCaller(source_dir, build_system['backend'])
 
     with BuildEnvironment() as env:
@@ -71,6 +78,21 @@ def load_build_system(source_dir):
     return pyproject_data['build-system']
 
 
+def compat_build_system(source_dir):
+    """
+    Given a source dir, attempt to get a build system backend
+    and requirements from pyproject.toml. Fallback to
+    setuptools.
+    """
+    try:
+        system = load_build_system(source_dir)
+    except Exception:
+        system = {}
+    system.setdefault('backend', 'setuptools.build_meta')
+    system.setdefault('requires', ['setuptools', 'wheel'])
+    return system
+
+
 def dir_to_zipfile(root):
     buffer = io.BytesIO()
     zip_file = zipfile.ZipFile(buffer, 'w')
@@ -83,6 +105,7 @@ def dir_to_zipfile(root):
             fs_path = os.path.join(root, path)
             rel_path = os.path.relpath(fs_path, root)
             zip_file.write(fs_path, rel_path)
+    return zip_file
 
 
 def build_meta_as_zip(builder=build_meta):
