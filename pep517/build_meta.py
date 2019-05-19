@@ -51,23 +51,24 @@ def mkdir_p(*args, **kwargs):
             raise
 
 
-def build_meta(source_dir, dest=None):
-    pyproject = os.path.join(source_dir, 'pyproject.toml')
+def build_meta(source_dir='.', dest=None, build_system=None):
+    build_system |= load_build_system(source_dir)
     dest = os.path.join(source_dir, dest or 'dist')
     mkdir_p(dest)
-
-    with open(pyproject) as f:
-        pyproject_data = pytoml.load(f)
-    # Ensure the mandatory data can be loaded
-    buildsys = pyproject_data['build-system']
-    requires = buildsys['requires']
-    backend = buildsys['build-backend']
-
-    hooks = Pep517HookCaller(source_dir, backend)
+    # ensure 'requires' is present
+    build_system['requires']
+    hooks = Pep517HookCaller(source_dir, build_system['backend'])
 
     with BuildEnvironment() as env:
-        env.pip_install(requires)
+        env.pip_install(build_system['requires'])
         _prep_meta(hooks, env, dest)
+
+
+def load_build_system(source_dir):
+    pyproject = os.path.join(source_dir, 'pyproject.toml')
+    with open(pyproject) as f:
+        pyproject_data = pytoml.load(f)
+    return pyproject_data['build-system']
 
 
 def dir_to_zipfile(root):
@@ -84,9 +85,9 @@ def dir_to_zipfile(root):
             zip_file.write(fs_path, rel_path)
 
 
-def build_meta_as_zip(source_dir='.'):
+def build_meta_as_zip(builder=build_meta):
     with tempdir() as out_dir:
-        build_meta(source_dir, out_dir)
+        builder(dest=out_dir)
         return dir_to_zipfile(out_dir)
 
 
