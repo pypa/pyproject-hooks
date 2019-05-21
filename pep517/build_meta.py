@@ -6,11 +6,22 @@ import os
 import io
 import shutil
 import zipfile
+import functools
+
+try:
+    import importlib.metadata as imp_meta
+except ImportError:
+    import importlib_metadata as imp_meta
+
+try:
+    from zipfile import Path
+except ImportError:
+    from zipp import Path
 
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
 from .dirtools import tempdir, mkdir_p
-from .build import validate_system, load_system
+from .build import validate_system, load_system, compat_system
 
 log = logging.getLogger(__name__)
 
@@ -60,6 +71,18 @@ def build_meta_as_zip(builder=build_meta):
     with tempdir() as out_dir:
         builder(dest=out_dir)
         return dir_to_zipfile(out_dir)
+
+
+def load(root):
+    """
+    Load the metadata from root.
+
+    Return an importlib.metadata.Distribution object.
+    """
+    system = compat_system(root)
+    builder = functools.partial(build_meta, source_dir=root, system=system)
+    path = Path(build_meta_as_zip(builder))
+    return imp_meta.PathDistribution(path)
 
 
 parser = argparse.ArgumentParser()
