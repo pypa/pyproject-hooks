@@ -79,6 +79,7 @@ def load(root):
 
     Return an importlib.metadata.Distribution object.
     """
+    root = os.path.expanduser(root)
     system = compat_system(root)
     builder = functools.partial(build_meta, source_dir=root, system=system)
     path = Path(build_meta_as_zip(builder))
