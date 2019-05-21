@@ -14,6 +14,9 @@ log = logging.getLogger(__name__)
 
 
 def validate_system(system):
+    """
+    Ensure build system has the requisite fields.
+    """
     required = {'requires', 'backend'}
     if required > set(system):
         missing = required - set(system)
@@ -22,6 +25,9 @@ def validate_system(system):
 
 
 def load_system(source_dir):
+    """
+    Load the build system from a source dir (pyproject.toml).
+    """
     pyproject = os.path.join(source_dir, 'pyproject.toml')
     with open(pyproject) as f:
         pyproject_data = pytoml.load(f)
