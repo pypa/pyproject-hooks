@@ -4,26 +4,15 @@ import argparse
 import logging
 import os
 import io
-import contextlib
 import pytoml
 import shutil
-import errno
-import tempfile
 import zipfile
 
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
+from .dirtools import tempdir, mkdir_p
 
 log = logging.getLogger(__name__)
-
-
-@contextlib.contextmanager
-def tempdir():
-    td = tempfile.mkdtemp()
-    try:
-        yield td
-    finally:
-        shutil.rmtree(td)
 
 
 def _prep_meta(hooks, env, dest):
@@ -38,17 +27,6 @@ def _prep_meta(hooks, env, dest):
         filename = hooks.prepare_metadata_for_build_wheel(td, {})
         source = os.path.join(td, filename)
         shutil.move(source, os.path.join(dest, os.path.basename(filename)))
-
-
-def mkdir_p(*args, **kwargs):
-    """Like `mkdir`, but does not raise an exception if the
-    directory already exists.
-    """
-    try:
-        return os.mkdir(*args, **kwargs)
-    except OSError as exc:
-        if exc.errno != errno.EEXIST:
-            raise
 
 
 def validate_build_system(system):

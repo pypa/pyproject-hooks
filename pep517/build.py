@@ -3,25 +3,15 @@
 import argparse
 import logging
 import os
-import contextlib
 import pytoml
 import shutil
 import errno
-import tempfile
 
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
+from .dirtools import tempdir
 
 log = logging.getLogger(__name__)
-
-
-@contextlib.contextmanager
-def tempdir():
-    td = tempfile.mkdtemp()
-    try:
-        yield td
-    finally:
-        shutil.rmtree(td)
 
 
 def _do_build(hooks, env, dist, dest):
