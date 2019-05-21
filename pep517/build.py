@@ -17,7 +17,7 @@ def validate_system(system):
     """
     Ensure build system has the requisite fields.
     """
-    required = {'requires', 'backend'}
+    required = {'requires', 'build-backend'}
     if required > set(system):
         missing = required - set(system)
         message = "Missing required fields: {missing}".format(**locals())
@@ -44,7 +44,7 @@ def compat_system(source_dir):
         system = load_system(source_dir)
     except Exception:
         system = {}
-    system.setdefault('backend', 'setuptools.build_meta')
+    system.setdefault('build-backend', 'setuptools.build_meta')
     system.setdefault('requires', ['setuptools', 'wheel'])
     return system
 
@@ -73,7 +73,7 @@ def build(source_dir, dist, dest=None, system=None):
     mkdir_p(dest)
 
     validate_system(system)
-    hooks = Pep517HookCaller(source_dir, system['backend'])
+    hooks = Pep517HookCaller(source_dir, system['build-backend'])
 
     with BuildEnvironment() as env:
         env.pip_install(system['requires'])

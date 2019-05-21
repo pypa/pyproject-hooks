@@ -34,7 +34,7 @@ def build_meta(source_dir='.', dest=None, system=None):
     dest = os.path.join(source_dir, dest or 'dist')
     mkdir_p(dest)
     validate_system(system)
-    hooks = Pep517HookCaller(source_dir, system['backend'])
+    hooks = Pep517HookCaller(source_dir, system['build-backend'])
 
     with BuildEnvironment() as env:
         env.pip_install(system['requires'])
