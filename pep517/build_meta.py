@@ -4,13 +4,13 @@ import argparse
 import logging
 import os
 import io
-import pytoml
 import shutil
 import zipfile
 
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
 from .dirtools import tempdir, mkdir_p
+from .build import validate_system, load_system
 
 log = logging.getLogger(__name__)
 
@@ -29,46 +29,16 @@ def _prep_meta(hooks, env, dest):
         shutil.move(source, os.path.join(dest, os.path.basename(filename)))
 
 
-def validate_build_system(system):
-    required = {'requires', 'backend'}
-    if required > set(system):
-        missing = required - set(system)
-        message = "Missing required fields: {missing}".format(**locals())
-        raise ValueError(message)
-
-
-def build_meta(source_dir='.', dest=None, build_system=None):
-    build_system = build_system or load_build_system(source_dir)
+def build_meta(source_dir='.', dest=None, system=None):
+    system = system or load_system(source_dir)
     dest = os.path.join(source_dir, dest or 'dist')
     mkdir_p(dest)
-    validate_build_system(build_system)
-    hooks = Pep517HookCaller(source_dir, build_system['backend'])
+    validate_system(system)
+    hooks = Pep517HookCaller(source_dir, system['backend'])
 
     with BuildEnvironment() as env:
-        env.pip_install(build_system['requires'])
+        env.pip_install(system['requires'])
         _prep_meta(hooks, env, dest)
-
-
-def load_build_system(source_dir):
-    pyproject = os.path.join(source_dir, 'pyproject.toml')
-    with open(pyproject) as f:
-        pyproject_data = pytoml.load(f)
-    return pyproject_data['build-system']
-
-
-def compat_build_system(source_dir):
-    """
-    Given a source dir, attempt to get a build system backend
-    and requirements from pyproject.toml. Fallback to
-    setuptools.
-    """
-    try:
-        system = load_build_system(source_dir)
-    except Exception:
-        system = {}
-    system.setdefault('backend', 'setuptools.build_meta')
-    system.setdefault('requires', ['setuptools', 'wheel'])
-    return system
 
 
 def dir_to_zipfile(root):
