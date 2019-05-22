@@ -3,9 +3,7 @@
 import argparse
 import logging
 import os
-import io
 import shutil
-import zipfile
 import functools
 
 try:
@@ -20,7 +18,7 @@ except ImportError:
 
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
-from .dirtools import tempdir, mkdir_p
+from .dirtools import tempdir, mkdir_p, dir_to_zipfile
 from .build import validate_system, load_system, compat_system
 
 log = logging.getLogger(__name__)
@@ -50,21 +48,6 @@ def build(source_dir='.', dest=None, system=None):
     with BuildEnvironment() as env:
         env.pip_install(system['requires'])
         _prep_meta(hooks, env, dest)
-
-
-def dir_to_zipfile(root):
-    buffer = io.BytesIO()
-    zip_file = zipfile.ZipFile(buffer, 'w')
-    for root, dirs, files in os.walk(root):
-        for path in dirs:
-            fs_path = os.path.join(root, path)
-            rel_path = os.path.relpath(fs_path, root)
-            zip_file.writestr(rel_path + '/', '')
-        for path in files:
-            fs_path = os.path.join(root, path)
-            rel_path = os.path.relpath(fs_path, root)
-            zip_file.write(fs_path, rel_path)
-    return zip_file
 
 
 def build_as_zip(builder=build):
