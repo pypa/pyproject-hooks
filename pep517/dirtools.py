@@ -7,6 +7,7 @@ import errno
 
 @contextlib.contextmanager
 def tempdir():
+    """Create a temporary directory in a context manager."""
     td = tempfile.mkdtemp()
     try:
         yield td
