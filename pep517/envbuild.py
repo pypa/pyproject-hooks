@@ -5,7 +5,7 @@ import os
 import logging
 import pytoml
 import shutil
-from subprocess import check_call
+from subprocess import check_output, STDOUT
 import sys
 from sysconfig import get_paths
 from tempfile import mkdtemp
@@ -90,9 +90,10 @@ class BuildEnvironment(object):
         if not reqs:
             return
         log.info('Calling pip to install %s', reqs)
-        check_call([
+        return check_output([
             sys.executable, '-m', 'pip', 'install', '--ignore-installed',
-            '--prefix', self.path] + list(reqs))
+            '--prefix', self.path] + list(reqs),
+            stderr=STDOUT)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         needs_cleanup = (

@@ -2,7 +2,7 @@ from contextlib import contextmanager
 import os
 from os.path import dirname, abspath, join as pjoin
 import shutil
-from subprocess import check_call
+from subprocess import check_call, check_output, STDOUT
 import sys
 from tempfile import mkdtemp
 
@@ -47,6 +47,15 @@ def default_subprocess_runner(cmd, cwd=None, extra_environ=None):
         env.update(extra_environ)
 
     check_call(cmd, cwd=cwd, env=env)
+
+
+def quiet_subprocess_runner(cmd, cwd=None, extra_environ=None):
+    """A method of calling the wrapper subprocess while suppressing output."""
+    env = os.environ.copy()
+    if extra_environ:
+        env.update(extra_environ)
+
+    check_output(cmd, cwd=cwd, env=env, stderr=STDOUT)
 
 
 def norm_and_check(source_tree, requested):

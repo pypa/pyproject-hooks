@@ -17,7 +17,7 @@ except ImportError:
     from zipp import Path
 
 from .envbuild import BuildEnvironment
-from .wrappers import Pep517HookCaller
+from .wrappers import Pep517HookCaller, quiet_subprocess_runner
 from .dirtools import tempdir, mkdir_p, dir_to_zipfile
 from .build import validate_system, load_system, compat_system
 
@@ -45,9 +45,10 @@ def build(source_dir='.', dest=None, system=None):
     validate_system(system)
     hooks = Pep517HookCaller(source_dir, system['build-backend'])
 
-    with BuildEnvironment() as env:
-        env.pip_install(system['requires'])
-        _prep_meta(hooks, env, dest)
+    with hooks.subprocess_runner(quiet_subprocess_runner):
+        with BuildEnvironment() as env:
+            env.pip_install(system['requires'])
+            _prep_meta(hooks, env, dest)
 
 
 def build_as_zip(builder=build):
