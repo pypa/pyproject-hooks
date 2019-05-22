@@ -7,10 +7,13 @@ import pytest
 from pep517 import meta
 
 
-@pytest.mark.xfail(
+pep517_needs_python_3 = pytest.mark.xfail(
     'sys.version_info < (3,)',
     reason="pep517 cannot be built on Python 2",
 )
+
+
+@pep517_needs_python_3
 def test_meta_for_this_package():
     dist = meta.load('.')
     assert re.match(r'[\d.]+', dist.version)
@@ -27,6 +30,7 @@ def test_classic_package(tmpdir):
     assert dist.metadata['Name'] == 'foo'
 
 
+@pep517_needs_python_3
 def test_meta_output(capfd):
     """load shouldn't emit any output"""
     meta.load('.')
