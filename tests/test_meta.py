@@ -25,3 +25,10 @@ def test_classic_package(tmpdir):
     dist = meta.load(str(tmpdir))
     assert dist.version == '1.0'
     assert dist.metadata['Name'] == 'foo'
+
+
+def test_meta_output(capfd):
+    """load shouldn't emit any output"""
+    meta.load('.')
+    captured = capfd.readouterr()
+    assert captured.out == captured.err == ''
