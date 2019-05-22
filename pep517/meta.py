@@ -40,7 +40,7 @@ def _prep_meta(hooks, env, dest):
         shutil.move(source, os.path.join(dest, os.path.basename(filename)))
 
 
-def build_meta(source_dir='.', dest=None, system=None):
+def build(source_dir='.', dest=None, system=None):
     system = system or load_system(source_dir)
     dest = os.path.join(source_dir, dest or 'dist')
     mkdir_p(dest)
@@ -67,7 +67,7 @@ def dir_to_zipfile(root):
     return zip_file
 
 
-def build_meta_as_zip(builder=build_meta):
+def build_as_zip(builder=build):
     with tempdir() as out_dir:
         builder(dest=out_dir)
         return dir_to_zipfile(out_dir)
@@ -81,8 +81,8 @@ def load(root):
     """
     root = os.path.expanduser(root)
     system = compat_system(root)
-    builder = functools.partial(build_meta, source_dir=root, system=system)
-    path = Path(build_meta_as_zip(builder))
+    builder = functools.partial(build, source_dir=root, system=system)
+    path = Path(build_as_zip(builder))
     return imp_meta.PathDistribution(path)
 
 
@@ -99,7 +99,7 @@ parser.add_argument(
 
 def main():
     args = parser.parse_args()
-    build_meta(args.source_dir, args.out_dir)
+    build(args.source_dir, args.out_dir)
 
 
 if __name__ == '__main__':
