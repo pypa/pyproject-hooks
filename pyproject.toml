@@ -10,6 +10,7 @@ home-page = "https://github.com/takluyver/pep517"
 description-file = "README.rst"
 requires = [
     "pytoml",
+    "importlib_resources; python_version < '3.7'",
 ]
 classifiers = ["License :: OSI Approved :: MIT License"]
 

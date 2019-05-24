@@ -1,14 +1,17 @@
+import threading
 from contextlib import contextmanager
 import os
-from os.path import dirname, abspath, join as pjoin
+from os.path import abspath, join as pjoin
 import shutil
-from subprocess import check_call
+from subprocess import check_call, check_output, STDOUT
 import sys
 from tempfile import mkdtemp
+try:
+    import importlib.resources as resources
+except ImportError:
+    import importlib_resources as resources
 
 from . import compat
-
-_in_proc_script = pjoin(dirname(abspath(__file__)), '_in_process.py')
 
 
 @contextmanager
@@ -47,6 +50,15 @@ def default_subprocess_runner(cmd, cwd=None, extra_environ=None):
         env.update(extra_environ)
 
     check_call(cmd, cwd=cwd, env=env)
+
+
+def quiet_subprocess_runner(cmd, cwd=None, extra_environ=None):
+    """A method of calling the wrapper subprocess while suppressing output."""
+    env = os.environ.copy()
+    if extra_environ:
+        env.update(extra_environ)
+
+    check_output(cmd, cwd=cwd, env=env, stderr=STDOUT)
 
 
 def norm_and_check(source_tree, requested):
@@ -200,11 +212,12 @@ class Pep517HookCaller(object):
                               indent=2)
 
             # Run the hook in a subprocess
-            self._subprocess_runner(
-                [sys.executable, _in_proc_script, hook_name, td],
-                cwd=self.source_dir,
-                extra_environ=extra_environ
-            )
+            with resources.path(__package__, '_in_process.py') as script:
+                self._subprocess_runner(
+                    [sys.executable, script, hook_name, td],
+                    cwd=self.source_dir,
+                    extra_environ=extra_environ
+                )
 
             data = compat.read_json(pjoin(td, 'output.json'))
             if data.get('unsupported'):
@@ -218,3 +231,37 @@ class Pep517HookCaller(object):
                     message=data.get('backend_error', '')
                 )
             return data['return_val']
+
+
+class LoggerWrapper(threading.Thread):
+    """
+    Read messages from a pipe and redirect them
+    to a logger (see python's logging module).
+    """
+
+    def __init__(self, logger, level):
+        threading.Thread.__init__(self)
+        self.daemon = True
+
+        self.logger = logger
+        self.level = level
+
+        # create the pipe and reader
+        self.fd_read, self.fd_write = os.pipe()
+        self.reader = os.fdopen(self.fd_read)
+
+        self.start()
+
+    def fileno(self):
+        return self.fd_write
+
+    @staticmethod
+    def remove_newline(msg):
+        return msg[:-1] if msg.endswith(os.linesep) else msg
+
+    def run(self):
+        for line in self.reader:
+            self._write(self.remove_newline(line))
+
+    def _write(self, message):
+        self.logger.log(self.level, message)

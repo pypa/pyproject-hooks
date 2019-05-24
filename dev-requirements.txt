@@ -4,3 +4,4 @@ mock
 testpath
 pytoml
 setuptools>=30
+importlib_resources; python_version < '3.7'
