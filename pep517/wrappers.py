@@ -79,8 +79,12 @@ class Pep517HookCaller(object):
     source_dir : The path to the source directory, containing pyproject.toml.
     backend : The build backend spec, as per PEP 517, from pyproject.toml.
     backend_path : The backend path, as per PEP 517, from pyproject.toml.
+    runner : A callable that invokes the wrapper subprocess.
     """
-    def __init__(self, source_dir, build_backend, backend_path=None):
+    def __init__(self, source_dir, build_backend, backend_path=None, runner=None):
+        if runner is None:
+            runner = default_subprocess_runner
+
         self.source_dir = abspath(source_dir)
         self.build_backend = build_backend
         if backend_path:
@@ -88,7 +92,7 @@ class Pep517HookCaller(object):
                 norm_and_check(self.source_dir, p) for p in backend_path
             ]
         self.backend_path = backend_path
-        self._subprocess_runner = default_subprocess_runner
+        self._subprocess_runner = runner
 
     # TODO: Is this over-engineered? Maybe frontends only need to
     #       set this when creating the wrapper, not on every call.
