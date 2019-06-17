@@ -81,7 +81,13 @@ class Pep517HookCaller(object):
     backend_path : The backend path, as per PEP 517, from pyproject.toml.
     runner : A callable that invokes the wrapper subprocess.
     """
-    def __init__(self, source_dir, build_backend, backend_path=None, runner=None):
+    def __init__(
+            self,
+            source_dir,
+            build_backend,
+            backend_path=None,
+            runner=None,
+    ):
         if runner is None:
             runner = default_subprocess_runner
 
