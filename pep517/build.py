@@ -9,6 +9,7 @@ import shutil
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
 from .dirtools import tempdir, mkdir_p
+from .compat import FileNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -39,11 +40,12 @@ def compat_system(source_dir):
     """
     Given a source dir, attempt to get a build system backend
     and requirements from pyproject.toml. Fallback to
-    setuptools.
+    setuptools but only if the file was not found or a build
+    system was not indicated.
     """
     try:
         system = load_system(source_dir)
-    except Exception:
+    except (FileNotFoundError, KeyError):
         system = {}
     system.setdefault('build-backend', 'setuptools.build_meta')
     system.setdefault('requires', ['setuptools', 'wheel'])
