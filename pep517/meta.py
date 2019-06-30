@@ -59,9 +59,9 @@ def build_as_zip(builder=build):
 
 def load(root):
     """
-    Load the metadata from root.
-
-    Return an importlib.metadata.Distribution object.
+    Given a source directory (root) of a package,
+    return an importlib.metadata.Distribution object
+    with metadata build from that package.
     """
     root = os.path.expanduser(root)
     system = compat_system(root)
