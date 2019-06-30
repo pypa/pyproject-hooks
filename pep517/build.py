@@ -19,8 +19,9 @@ def validate_system(system):
     """
     required = {'requires', 'build-backend'}
     if required > set(system):
-        missing = required - set(system)
-        message = "Missing required fields: {missing}".format(**locals())
+        message = "Missing required fields: {missing}".format(
+            missing=required-set(system),
+        )
         raise ValueError(message)
 
 
