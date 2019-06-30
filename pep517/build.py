@@ -19,7 +19,7 @@ def validate_system(system):
     Ensure build system has the requisite fields.
     """
     required = {'requires', 'build-backend'}
-    if required > set(system):
+    if not (required <= set(system)):
         message = "Missing required fields: {missing}".format(
             missing=required-set(system),
         )
