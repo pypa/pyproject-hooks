@@ -47,7 +47,10 @@ def compat_system(source_dir):
         system = load_system(source_dir)
     except (FileNotFoundError, KeyError):
         system = {}
-    system.setdefault('build-backend', 'setuptools.build_meta')
+    system.setdefault(
+        'build-backend',
+        'setuptools.build_meta:__legacy__',
+    )
     system.setdefault('requires', ['setuptools', 'wheel'])
     return system
 
