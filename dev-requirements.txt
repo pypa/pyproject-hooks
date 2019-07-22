@@ -4,3 +4,5 @@ mock
 testpath
 pytoml
 setuptools>=30
+importlib_metadata
+zipp

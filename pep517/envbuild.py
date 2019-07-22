@@ -10,7 +10,7 @@ import sys
 from sysconfig import get_paths
 from tempfile import mkdtemp
 
-from .wrappers import Pep517HookCaller
+from .wrappers import Pep517HookCaller, LoggerWrapper
 
 log = logging.getLogger(__name__)
 
@@ -90,9 +90,14 @@ class BuildEnvironment(object):
         if not reqs:
             return
         log.info('Calling pip to install %s', reqs)
-        check_call([
+        cmd = [
             sys.executable, '-m', 'pip', 'install', '--ignore-installed',
-            '--prefix', self.path] + list(reqs))
+            '--prefix', self.path] + list(reqs)
+        check_call(
+            cmd,
+            stdout=LoggerWrapper(log, logging.INFO),
+            stderr=LoggerWrapper(log, logging.ERROR),
+        )
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         needs_cleanup = (
