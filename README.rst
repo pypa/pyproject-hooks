@@ -43,7 +43,11 @@ available:
 
     print(build_sys['requires'])  # List of static requirements
 
-    hooks = Pep517HookCaller(src, build_backend=build_sys['build_backend'])
+    hooks = Pep517HookCaller(
+        src, 
+        build_backend=build_sys['build_backend'],
+        backend_path=build_sys.get('backend-path'),
+    )
 
     config_options = {}   # Optional parameters for backend
     # List of dynamic requirements:

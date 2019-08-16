@@ -79,7 +79,9 @@ def build(source_dir, dist, dest=None, system=None):
     mkdir_p(dest)
 
     validate_system(system)
-    hooks = Pep517HookCaller(source_dir, system['build-backend'])
+    hooks = Pep517HookCaller(
+        source_dir, system['build-backend'], system.get('backend-path')
+    )
 
     with BuildEnvironment() as env:
         env.pip_install(system['requires'])

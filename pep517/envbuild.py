@@ -19,7 +19,11 @@ def _load_pyproject(source_dir):
     with open(os.path.join(source_dir, 'pyproject.toml')) as f:
         pyproject_data = pytoml.load(f)
     buildsys = pyproject_data['build-system']
-    return buildsys['requires'], buildsys['build-backend']
+    return (
+        buildsys['requires'],
+        buildsys['build-backend'],
+        buildsys.get('backend-path'),
+    )
 
 
 class BuildEnvironment(object):
@@ -131,8 +135,8 @@ def build_wheel(source_dir, wheel_dir, config_settings=None):
     """
     if config_settings is None:
         config_settings = {}
-    requires, backend = _load_pyproject(source_dir)
-    hooks = Pep517HookCaller(source_dir, backend)
+    requires, backend, backend_path = _load_pyproject(source_dir)
+    hooks = Pep517HookCaller(source_dir, backend, backend_path)
 
     with BuildEnvironment() as env:
         env.pip_install(requires)
@@ -153,8 +157,8 @@ def build_sdist(source_dir, sdist_dir, config_settings=None):
     """
     if config_settings is None:
         config_settings = {}
-    requires, backend = _load_pyproject(source_dir)
-    hooks = Pep517HookCaller(source_dir, backend)
+    requires, backend, backend_path = _load_pyproject(source_dir)
+    hooks = Pep517HookCaller(source_dir, backend, backend_path)
 
     with BuildEnvironment() as env:
         env.pip_install(requires)
