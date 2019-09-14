@@ -38,6 +38,10 @@ class BackendInvalid(Exception):
         self.message = message
 
 
+class HookMissing(Exception):
+    """Raised if a hook is missing and we are not executing the fallback"""
+
+
 def contained_in(filename, directory):
     """Test if a file is located within the given directory."""
     filename = os.path.normcase(os.path.abspath(filename))
@@ -87,15 +91,19 @@ def get_requires_for_build_wheel(config_settings):
         return hook(config_settings)
 
 
-def prepare_metadata_for_build_wheel(metadata_directory, config_settings):
+def prepare_metadata_for_build_wheel(
+        metadata_directory, config_settings, _allow_fallback):
     """Invoke optional prepare_metadata_for_build_wheel
 
-    Implements a fallback by building a wheel if the hook isn't defined.
+    Implements a fallback by building a wheel if the hook isn't defined,
+    unless _allow_fallback is False in which case HookMissing is raised.
     """
     backend = _build_backend()
     try:
         hook = backend.prepare_metadata_for_build_wheel
     except AttributeError:
+        if not _allow_fallback:
+            raise HookMissing()
         return _get_wheel_metadata_from_wheel(backend, metadata_directory,
                                               config_settings)
     else:
@@ -239,6 +247,8 @@ def main():
     except GotUnsupportedOperation as e:
         json_out['unsupported'] = True
         json_out['traceback'] = e.traceback
+    except HookMissing:
+        json_out['hook_missing'] = True
 
     compat.write_json(json_out, pjoin(control_dir, 'output.json'), indent=2)
 
