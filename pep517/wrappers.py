@@ -87,9 +87,18 @@ class Pep517HookCaller(object):
     """A wrapper around a source directory to be built with a PEP 517 backend.
 
     source_dir : The path to the source directory, containing pyproject.toml.
-    backend : The build backend spec, as per PEP 517, from pyproject.toml.
+    build_backend : The build backend spec, as per PEP 517, from
+        pyproject.toml.
     backend_path : The backend path, as per PEP 517, from pyproject.toml.
     runner : A callable that invokes the wrapper subprocess.
+
+    The 'runner', if provided, must expect the following:
+        cmd : a list of strings representing the command and arguments to
+            execute, as would be passed to e.g. 'subprocess.check_call'.
+        cwd : a string representing the working directory that must be
+            used for the subprocess. Corresponds to the provided source_dir.
+        extra_environ : a dict mapping environment variable names to values
+            which must be set for the subprocess execution.
     """
     def __init__(
             self,
@@ -114,6 +123,9 @@ class Pep517HookCaller(object):
     #       set this when creating the wrapper, not on every call.
     @contextmanager
     def subprocess_runner(self, runner):
+        """A context manager for temporarily overriding the default subprocess
+        runner.
+        """
         prev = self._subprocess_runner
         self._subprocess_runner = runner
         yield
