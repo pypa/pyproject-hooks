@@ -45,7 +45,11 @@ def test_prepare_metadata_for_build_wheel_no_fallback():
 
     with TemporaryDirectory() as metadatadir:
         with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
-            with pytest.raises(HookMissing):
+            with pytest.raises(HookMissing) as exc_info:
                 hooks.prepare_metadata_for_build_wheel(
                     metadatadir, {}, _allow_fallback=False
                 )
+
+            e = exc_info.value
+            assert 'prepare_metadata_for_build_wheel' == e.hook_name
+            assert 'prepare_metadata_for_build_wheel' in str(e)

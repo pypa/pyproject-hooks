@@ -37,6 +37,9 @@ class BackendInvalid(Exception):
 
 class HookMissing(Exception):
     """Will be raised on missing hooks."""
+    def __init__(self, hook_name):
+        super(HookMissing, self).__init__(hook_name)
+        self.hook_name = hook_name
 
 
 class UnsupportedOperation(Exception):
@@ -245,7 +248,7 @@ class Pep517HookCaller(object):
                     message=data.get('backend_error', '')
                 )
             if data.get('hook_missing'):
-                raise HookMissing()
+                raise HookMissing(hook_name)
             return data['return_val']
 
 
