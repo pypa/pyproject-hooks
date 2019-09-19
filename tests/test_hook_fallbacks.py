@@ -1,9 +1,10 @@
 from os.path import dirname, abspath, join as pjoin
+import pytest
 import pytoml
 from testpath import modified_env, assert_isfile
 from testpath.tempdir import TemporaryDirectory
 
-from pep517.wrappers import Pep517HookCaller
+from pep517.wrappers import HookMissing, Pep517HookCaller
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
@@ -37,3 +38,18 @@ def test_prepare_metadata_for_build_wheel():
             hooks.prepare_metadata_for_build_wheel(metadatadir, {})
 
         assert_isfile(pjoin(metadatadir, 'pkg2-0.5.dist-info', 'METADATA'))
+
+
+def test_prepare_metadata_for_build_wheel_no_fallback():
+    hooks = get_hooks('pkg2')
+
+    with TemporaryDirectory() as metadatadir:
+        with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
+            with pytest.raises(HookMissing) as exc_info:
+                hooks.prepare_metadata_for_build_wheel(
+                    metadatadir, {}, _allow_fallback=False
+                )
+
+            e = exc_info.value
+            assert 'prepare_metadata_for_build_wheel' == e.hook_name
+            assert 'prepare_metadata_for_build_wheel' in str(e)

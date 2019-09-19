@@ -35,6 +35,13 @@ class BackendInvalid(Exception):
         self.message = message
 
 
+class HookMissing(Exception):
+    """Will be raised on missing hooks."""
+    def __init__(self, hook_name):
+        super(HookMissing, self).__init__(hook_name)
+        self.hook_name = hook_name
+
+
 class UnsupportedOperation(Exception):
     """May be raised by build_sdist if the backend indicates that it can't."""
     def __init__(self, traceback):
@@ -146,18 +153,21 @@ class Pep517HookCaller(object):
         })
 
     def prepare_metadata_for_build_wheel(
-            self, metadata_directory, config_settings=None):
+            self, metadata_directory, config_settings=None,
+            _allow_fallback=True):
         """Prepare a *.dist-info folder with metadata for this project.
 
         Returns the name of the newly created folder.
 
         If the build backend defines a hook with this name, it will be called
         in a subprocess. If not, the backend will be asked to build a wheel,
-        and the dist-info extracted from that.
+        and the dist-info extracted from that (unless _allow_fallback is
+        False).
         """
         return self._call_hook('prepare_metadata_for_build_wheel', {
             'metadata_directory': abspath(metadata_directory),
             'config_settings': config_settings,
+            '_allow_fallback': _allow_fallback,
         })
 
     def build_wheel(
@@ -249,6 +259,8 @@ class Pep517HookCaller(object):
                     backend_path=self.backend_path,
                     message=data.get('backend_error', '')
                 )
+            if data.get('hook_missing'):
+                raise HookMissing(hook_name)
             return data['return_val']
 
 
