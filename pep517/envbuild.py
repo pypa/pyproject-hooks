@@ -3,7 +3,7 @@
 
 import os
 import logging
-import pytoml
+import toml
 import shutil
 from subprocess import check_call
 import sys
@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 def _load_pyproject(source_dir):
     with open(os.path.join(source_dir, 'pyproject.toml')) as f:
-        pyproject_data = pytoml.load(f)
+        pyproject_data = toml.load(f)
     buildsys = pyproject_data['build-system']
     return (
         buildsys['requires'],

@@ -1,5 +1,5 @@
 from os.path import dirname, abspath, join as pjoin
-import pytoml
+import toml
 from testpath import modified_env
 import pytest
 
@@ -12,7 +12,7 @@ BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
 def get_hooks(pkg, backend=None, path=None):
     source_dir = pjoin(SAMPLES_DIR, pkg)
     with open(pjoin(source_dir, 'pyproject.toml')) as f:
-        data = pytoml.load(f)
+        data = toml.load(f)
     if backend is None:
         backend = data['build-system']['build-backend']
     if path is None:
