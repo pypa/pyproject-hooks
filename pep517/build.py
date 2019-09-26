@@ -3,7 +3,7 @@
 import argparse
 import logging
 import os
-import pytoml
+import toml
 import shutil
 
 from .envbuild import BuildEnvironment
@@ -32,7 +32,7 @@ def load_system(source_dir):
     """
     pyproject = os.path.join(source_dir, 'pyproject.toml')
     with open(pyproject) as f:
-        pyproject_data = pytoml.load(f)
+        pyproject_data = toml.load(f)
     return pyproject_data['build-system']
 
 

@@ -2,7 +2,7 @@ pytest
 pytest-flake8
 mock
 testpath
-pytoml
+toml
 setuptools>=30
 importlib_metadata
 zipp

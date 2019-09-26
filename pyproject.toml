@@ -9,7 +9,7 @@ author-email = "thomas@kluyver.me.uk"
 home-page = "https://github.com/takluyver/pep517"
 description-file = "README.rst"
 requires = [
-    "pytoml",
+    "toml",
     "importlib_metadata",
     "zipp",
 ]

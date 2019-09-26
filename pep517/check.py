@@ -4,7 +4,7 @@ import argparse
 import logging
 import os
 from os.path import isfile, join as pjoin
-from pytoml import TomlError, load as toml_load
+from toml import TomlDecodeError, load as toml_load
 import shutil
 from subprocess import CalledProcessError
 import sys
@@ -149,7 +149,7 @@ def check(source_dir):
         backend = buildsys['build-backend']
         backend_path = buildsys.get('backend-path')
         log.info('Loaded pyproject.toml')
-    except (TomlError, KeyError):
+    except (TomlDecodeError, KeyError):
         log.error("Invalid pyproject.toml", exc_info=True)
         return False
 
