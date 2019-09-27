@@ -6,12 +6,16 @@ build-backend = "flit.buildapi"
 module = "pep517"
 author = "Thomas Kluyver"
 author-email = "thomas@kluyver.me.uk"
-home-page = "https://github.com/takluyver/pep517"
+home-page = "https://github.com/pypa/pep517"
 description-file = "README.rst"
 requires = [
     "toml",
     "importlib_metadata",
     "zipp",
 ]
-classifiers = ["License :: OSI Approved :: MIT License"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3",
+]
 
