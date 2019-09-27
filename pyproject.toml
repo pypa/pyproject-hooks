@@ -6,7 +6,7 @@ build-backend = "flit.buildapi"
 module = "pep517"
 author = "Thomas Kluyver"
 author-email = "thomas@kluyver.me.uk"
-home-page = "https://github.com/takluyver/pep517"
+home-page = "https://github.com/pypa/pep517"
 description-file = "README.rst"
 requires = [
     "toml",
