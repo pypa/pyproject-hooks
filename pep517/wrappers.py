@@ -126,8 +126,6 @@ class Pep517HookCaller(object):
         self.backend_path = backend_path
         self._subprocess_runner = runner
 
-    # TODO: Is this over-engineered? Maybe frontends only need to
-    #       set this when creating the wrapper, not on every call.
     @contextmanager
     def subprocess_runner(self, runner):
         """A context manager for temporarily overriding the default subprocess
