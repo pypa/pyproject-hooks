@@ -133,8 +133,10 @@ class Pep517HookCaller(object):
         """
         prev = self._subprocess_runner
         self._subprocess_runner = runner
-        yield
-        self._subprocess_runner = prev
+        try:
+            yield
+        finally:
+            self._subprocess_runner = prev
 
     def get_requires_for_build_wheel(self, config_settings=None):
         """Identify packages required for building a wheel
