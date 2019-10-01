@@ -7,18 +7,22 @@ import pytest
 import toml
 import zipfile
 
-from pep517.wrappers import Pep517HookCaller
+from mock import Mock
+
+from pep517.wrappers import Pep517HookCaller, default_subprocess_runner
 from pep517.wrappers import UnsupportedOperation, BackendUnavailable
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
 
 
-def get_hooks(pkg):
+def get_hooks(pkg, **kwargs):
     source_dir = pjoin(SAMPLES_DIR, pkg)
     with open(pjoin(source_dir, 'pyproject.toml')) as f:
         data = toml.load(f)
-    return Pep517HookCaller(source_dir, data['build-system']['build-backend'])
+    return Pep517HookCaller(
+        source_dir, data['build-system']['build-backend'], **kwargs
+    )
 
 
 def test_missing_backend_gives_exception():
@@ -103,3 +107,27 @@ def test_build_sdist_unsupported():
         with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
             with pytest.raises(UnsupportedOperation):
                 hooks.build_sdist(sdistdir, {'test_unsupported': True})
+
+
+def test_runner_replaced_on_exception(monkeypatch):
+    monkeypatch.setenv('PYTHONPATH', BUILDSYS_PKGS)
+
+    runner = Mock(wraps=default_subprocess_runner)
+    hooks = get_hooks('pkg1', runner=runner)
+
+    hooks.get_requires_for_build_wheel()
+    runner.assert_called_once()
+    runner.reset_mock()
+
+    runner2 = Mock(wraps=default_subprocess_runner)
+    try:
+        with hooks.subprocess_runner(runner2):
+            hooks.get_requires_for_build_wheel()
+            runner2.assert_called_once()
+            runner2.reset_mock()
+            raise RuntimeError()
+    except RuntimeError:
+        pass
+
+    hooks.get_requires_for_build_wheel()
+    runner.assert_called_once()
