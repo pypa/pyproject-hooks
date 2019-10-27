@@ -9,6 +9,18 @@ from tempfile import mkdtemp
 
 from . import compat
 
+
+try:
+    import importlib.resources as resources
+
+    def _in_proc_script_path():
+        return resources.path(__package__, '_in_process.py')
+except ImportError:
+    @contextmanager
+    def _in_proc_script_path():
+        yield pjoin(dirname(abspath(__file__)), '_in_process.py')
+
+
 _in_proc_script = pjoin(dirname(abspath(__file__)), '_in_process.py')
 
 
@@ -242,11 +254,12 @@ class Pep517HookCaller(object):
                               indent=2)
 
             # Run the hook in a subprocess
-            self._subprocess_runner(
-                [sys.executable, _in_proc_script, hook_name, td],
-                cwd=self.source_dir,
-                extra_environ=extra_environ
-            )
+            with _in_proc_script_path() as script:
+                self._subprocess_runner(
+                    [sys.executable, str(script), hook_name, td],
+                    cwd=self.source_dir,
+                    extra_environ=extra_environ
+                )
 
             data = compat.read_json(pjoin(td, 'output.json'))
             if data.get('unsupported'):
