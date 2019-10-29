@@ -21,9 +21,6 @@ except ImportError:
         yield pjoin(dirname(abspath(__file__)), '_in_process.py')
 
 
-_in_proc_script = pjoin(dirname(abspath(__file__)), '_in_process.py')
-
-
 @contextmanager
 def tempdir():
     td = mkdtemp()
