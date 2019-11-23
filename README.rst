@@ -11,7 +11,7 @@ provides:
 - Higher-level functions which install the build dependencies into a
   temporary environment and build a wheel/sdist using them.
 
-Run the tests with `tox <https://pypi.org/project/tox>`_.
+Run the tests with ``pytest`` or `tox <https://pypi.org/project/tox>`_.
 
 High level usage, with build requirements handled:
 
