@@ -10,8 +10,8 @@ home-page = "https://github.com/pypa/pep517"
 description-file = "README.rst"
 requires = [
     "toml",
-    "importlib_metadata",
-    "zipp",
+    "importlib_metadata;python_version<'3.8'",
+    "zipp;python_version<'3.8'",
 ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
