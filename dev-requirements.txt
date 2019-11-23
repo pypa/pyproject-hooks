@@ -4,5 +4,5 @@ mock
 testpath
 toml
 setuptools>=30
-importlib_metadata
-zipp
+importlib_metadata ; python_version<'3.8'
+zipp ; python_version<'3.8'
