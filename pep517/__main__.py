@@ -68,8 +68,14 @@ def main():
     configure_build_parser(build)
     check = subparsers.add_parser(
         "check",
-        help="Check a project and backend by attempting to build using PEP 517 hooks.",
-        description="Check a project and backend by attempting to build using PEP 517 hooks.",
+        help=(
+            "Check a project and backend by attempting to build using PEP "
+            "517 hooks."
+        ),
+        description=(
+            "Check a project and backend by attempting to build using PEP "
+            "517 hooks."
+        ),
     )
     configure_check_parser(check)
     meta = subparsers.add_parser(
