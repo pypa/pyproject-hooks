@@ -88,27 +88,6 @@ def build(source_dir, dist, dest=None, system=None):
         _do_build(hooks, env, dist, dest)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    'source_dir',
-    help="A directory containing pyproject.toml",
-)
-parser.add_argument(
-    '--binary', '-b',
-    action='store_true',
-    default=False,
-)
-parser.add_argument(
-    '--source', '-s',
-    action='store_true',
-    default=False,
-)
-parser.add_argument(
-    '--out-dir', '-o',
-    help="Destination in which to save the builds relative to source dir",
-)
-
-
 def main(args):
     # determine which dists to build
     dists = list(filter(None, (
@@ -121,4 +100,7 @@ def main(args):
 
 
 if __name__ == '__main__':
+    from .__main__ import configure_build_parser
+    parser = argparse.ArgumentParser()
+    configure_build_parser(parser)
     main(parser.parse_args())

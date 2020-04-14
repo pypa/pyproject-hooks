@@ -72,18 +72,10 @@ def load(root):
     return imp_meta.PathDistribution(path)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    'source_dir',
-    help="A directory containing pyproject.toml",
-)
-parser.add_argument(
-    '--out-dir', '-o',
-    help="Destination in which to save the builds relative to source dir",
-)
-
-
 def main():
+    from .__main__ import configure_meta_parser
+    parser = argparse.ArgumentParser()
+    configure_meta_parser(parser)
     args = parser.parse_args()
     build(args.source_dir, args.out_dir)
 

@@ -19,3 +19,5 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 
+[tool.flit.scripts]
+pep517 = "pep517.__main__:main"

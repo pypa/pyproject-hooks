@@ -167,12 +167,14 @@ def check(source_dir):
 
 
 def main(argv=None):
+    from .__main__ import configure_check_parser
     ap = argparse.ArgumentParser()
-    ap.add_argument(
-        'source_dir',
-        help="A directory containing pyproject.toml")
+    configure_check_parser(ap)
     args = ap.parse_args(argv)
+    run(args)
 
+
+def run(args):
     enable_colourful_output()
 
     ok = check(args.source_dir)
