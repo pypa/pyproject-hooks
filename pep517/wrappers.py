@@ -253,7 +253,7 @@ class Pep517HookCaller(object):
             # Run the hook in a subprocess
             with _in_proc_script_path() as script:
                 self._subprocess_runner(
-                    [sys.executable, str(script), hook_name, td],
+                    [sys.executable, abspath(str(script)), hook_name, td],
                     cwd=self.source_dir,
                     extra_environ=extra_environ
                 )
