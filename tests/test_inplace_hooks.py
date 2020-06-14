@@ -3,7 +3,7 @@ import toml
 from testpath import modified_env
 import pytest
 
-from pep517.wrappers import Pep517HookCaller, BackendInvalid
+from pep517 import Pep517HookCaller, BackendInvalid
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')

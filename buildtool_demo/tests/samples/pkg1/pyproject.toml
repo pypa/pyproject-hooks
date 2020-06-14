@@ -1,0 +1,3 @@
+[build-system]
+requires = ["eg_buildsys"]
+build-backend = "buildsys"
