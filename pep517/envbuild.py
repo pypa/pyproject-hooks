@@ -5,7 +5,7 @@ import os
 import logging
 import toml
 import shutil
-from subprocess import check_call
+import subprocess
 import sys
 from sysconfig import get_paths
 from tempfile import mkdtemp
@@ -97,11 +97,17 @@ class BuildEnvironment(object):
         cmd = [
             sys.executable, '-m', 'pip', 'install', '--ignore-installed',
             '--prefix', self.path] + list(reqs)
-        check_call(
+        env = os.environ.copy()
+        # Allow pip to operate without an activated virtualenv
+        env.pop("PIP_REQUIRE_VIRTUALENV", None)
+        retcode = subprocess.Popen(
             cmd,
             stdout=LoggerWrapper(log, logging.INFO),
             stderr=LoggerWrapper(log, logging.ERROR),
-        )
+            env=env,
+        ).wait()
+        if retcode != 0:
+            raise subprocess.CalledProcessError(retcode, cmd)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         needs_cleanup = (
