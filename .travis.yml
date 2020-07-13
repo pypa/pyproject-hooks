@@ -31,6 +31,7 @@ jobs:
 cache: pip
 
 install:
+- pip install -U virtualenv
 - pip install tox tox-venv
 
 script: tox
