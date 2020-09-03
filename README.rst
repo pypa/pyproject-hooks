@@ -8,38 +8,21 @@ provides:
   the current process.
 - Fallbacks for the optional hooks, so that frontends can call the hooks without
   checking which are defined.
-- Higher-level functions which install the build dependencies into a
-  temporary environment and build a wheel/sdist using them.
+- Functions to load the build system table from ``pyproject.toml``, with
+  optional fallback to setuptools.
 
 Run the tests with ``pytest`` or `tox <https://pypi.org/project/tox>`_.
 
-High level usage, with build requirements handled:
+Usage:
 
 .. code-block:: python
 
     import os
-    from pep517.envbuild import build_wheel, build_sdist
+    from pep517 import Pep517HookCaller
+    from pep517.pyproject import load_system
 
     src = 'path/to/source'  # Folder containing 'pyproject.toml'
-    destination = 'also/a/folder'
-    whl_filename = build_wheel(src, destination)
-    assert os.path.isfile(os.path.join(destination, whl_filename))
-
-    targz_filename = build_sdist(src, destination)
-    assert os.path.isfile(os.path.join(destination, targz_filename))
-
-Lower level usage—you are responsible for ensuring build requirements are
-available:
-
-.. code-block:: python
-
-    import os
-    import toml
-    from pep517.wrappers import Pep517HookCaller
-
-    src = 'path/to/source'  # Folder containing 'pyproject.toml'
-    with open(os.path.join(src, 'pyproject.toml')) as f:
-        build_sys = toml.load(f)['build-system']
+    build_sys = load_system(src)
 
     print(build_sys['requires'])  # List of static requirements
 
@@ -57,18 +40,9 @@ available:
     whl_filename = hooks.build_wheel(destination, config_options)
     assert os.path.isfile(os.path.join(destination, whl_filename))
 
-To test the build backend for a project, run in a system shell:
+The caller is responsible for installing build dependencies.
+The static requirements should be installed before trying to call any hooks.
 
-.. code-block:: shell
-
-    python3 -m pep517.check path/to/source  # source dir containing pyproject.toml
-
-To build a backend into source and/or binary distributions, run in a shell:
-
-.. code-block:: shell
-
-    python -m pep517.build path/to/source  # source dir containing pyproject.toml
-
-This 'build' module should be considered experimental while the PyPA `decides
-on the best place for this functionality
-<https://github.com/pypa/packaging-problems/issues/219>`_.
+The ``buildtool_demo`` package in this repository gives a more complete
+example of how to use the hooks. This is an example, and doesn't get installed
+with the ``pep517`` package.

@@ -8,7 +8,7 @@ except ImportError:
     from mock import patch, call  # Python 2 fallback
 import zipfile
 
-from pep517.envbuild import build_sdist, build_wheel, BuildEnvironment
+from ..envbuild import build_sdist, build_wheel, BuildEnvironment
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')

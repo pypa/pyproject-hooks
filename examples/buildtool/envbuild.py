@@ -9,8 +9,9 @@ from subprocess import check_call
 import sys
 from sysconfig import get_paths
 from tempfile import mkdtemp
+import threading
 
-from .wrappers import Pep517HookCaller, LoggerWrapper
+from pep517 import Pep517HookCaller
 
 log = logging.getLogger(__name__)
 
@@ -24,6 +25,40 @@ def _load_pyproject(source_dir):
         buildsys['build-backend'],
         buildsys.get('backend-path'),
     )
+
+
+class LoggerWrapper(threading.Thread):
+    """
+    Read messages from a pipe and redirect them
+    to a logger (see python's logging module).
+    """
+
+    def __init__(self, logger, level):
+        threading.Thread.__init__(self)
+        self.daemon = True
+
+        self.logger = logger
+        self.level = level
+
+        # create the pipe and reader
+        self.fd_read, self.fd_write = os.pipe()
+        self.reader = os.fdopen(self.fd_read)
+
+        self.start()
+
+    def fileno(self):
+        return self.fd_write
+
+    @staticmethod
+    def remove_newline(msg):
+        return msg[:-1] if msg.endswith(os.linesep) else msg
+
+    def run(self):
+        for line in self.reader:
+            self._write(self.remove_newline(line))
+
+    def _write(self, message):
+        self.logger.log(self.level, message)
 
 
 class BuildEnvironment(object):
