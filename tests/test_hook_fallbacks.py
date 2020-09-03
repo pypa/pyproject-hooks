@@ -4,7 +4,7 @@ import toml
 from testpath import modified_env, assert_isfile
 from testpath.tempdir import TemporaryDirectory
 
-from pep517.wrappers import HookMissing, Pep517HookCaller
+from pep517 import HookMissing, Pep517HookCaller
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')

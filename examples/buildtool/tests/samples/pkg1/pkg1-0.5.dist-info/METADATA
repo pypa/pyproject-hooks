@@ -1,0 +1,9 @@
+Metadata-Version: 1.2
+Name: pkg1
+Version: 0.5
+Summary: Sample package for tests
+Home-page: https://github.com/takluyver/pep517
+License: UNKNOWN
+Author: Thomas Kluyver
+Author-email: thomas@kluyver.me.uk
+Classifier: License :: OSI Approved :: MIT License

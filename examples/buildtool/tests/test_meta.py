@@ -4,7 +4,7 @@ import re
 
 import pytest
 
-from pep517 import meta
+from .. import meta
 
 
 pep517_needs_python_3 = pytest.mark.xfail(
