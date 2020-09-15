@@ -6,11 +6,17 @@ from testpath.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
 import pytest
 import toml
 import zipfile
+import sys
 
 from mock import Mock
 
 from pep517.wrappers import Pep517HookCaller, default_subprocess_runner
 from pep517.wrappers import UnsupportedOperation, BackendUnavailable
+
+
+if sys.version_info[0] == 2:
+    FileNotFoundError = IOError
+
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
@@ -131,3 +137,17 @@ def test_runner_replaced_on_exception(monkeypatch):
 
     hooks.get_requires_for_build_wheel()
     runner.assert_called_once()
+
+
+def test_custom_python_executable(monkeypatch, tmpdir):
+    monkeypatch.setenv('PYTHONPATH', BUILDSYS_PKGS)
+
+    runner = Mock(autospec=default_subprocess_runner)
+    hooks = get_hooks('pkg1', runner=runner, python_executable='some-python')
+
+    with hooks.subprocess_runner(runner):
+        with pytest.raises(FileNotFoundError):
+            # output.json is missing because we didn't actually run the hook
+            hooks.get_requires_for_build_wheel()
+        runner.assert_called_once()
+        assert runner.call_args[0][0][0] == 'some-python'
