@@ -28,7 +28,7 @@ Usage:
 
     hooks = Pep517HookCaller(
         src, 
-        build_backend=build_sys['build_backend'],
+        build_backend=build_sys['build-backend'],
         backend_path=build_sys.get('backend-path'),
     )
 
