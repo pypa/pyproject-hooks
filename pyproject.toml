@@ -1,5 +1,5 @@
 [build-system]
-requires = ["flit_core >=2,<4"]
+requires = ["flit_core >=2,<3"]
 build-backend = "flit_core.buildapi"
 
 [tool.flit.metadata]
@@ -10,6 +10,8 @@ home-page = "https://github.com/pypa/pep517"
 description-file = "README.rst"
 requires = [
     "toml",
+    "importlib_metadata;python_version<'3.8'",
+    "zipp;python_version<'3.8'",
 ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
