@@ -115,6 +115,7 @@ class Pep517HookCaller(object):
     build_backend : The build backend spec, as per PEP 517, from
         pyproject.toml.
     backend_path : The backend path, as per PEP 517, from pyproject.toml.
+    executable: The path to the isolated python executable to run within
     runner : A callable that invokes the wrapper subprocess.
 
     The 'runner', if provided, must expect the following:
@@ -131,6 +132,7 @@ class Pep517HookCaller(object):
             build_backend,
             backend_path=None,
             runner=None,
+            executable=sys.executable,
     ):
         if runner is None:
             runner = default_subprocess_runner
@@ -143,6 +145,7 @@ class Pep517HookCaller(object):
             ]
         self.backend_path = backend_path
         self._subprocess_runner = runner
+        self.executable = executable
 
     @contextmanager
     def subprocess_runner(self, runner):
@@ -262,7 +265,7 @@ class Pep517HookCaller(object):
             # Run the hook in a subprocess
             with _in_proc_script_path() as script:
                 self._subprocess_runner(
-                    [sys.executable, str(script), hook_name, td],
+                    [self.executable, str(script), hook_name, td],
                     cwd=self.source_dir,
                     extra_environ=extra_environ
                 )

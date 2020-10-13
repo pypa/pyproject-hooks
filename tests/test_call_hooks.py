@@ -1,4 +1,5 @@
 import os
+import sys
 from os.path import dirname, abspath, join as pjoin
 import tarfile
 from testpath import modified_env, assert_isfile
@@ -7,7 +8,7 @@ import pytest
 import toml
 import zipfile
 
-from mock import Mock
+from mock import Mock, patch
 
 from pep517.wrappers import Pep517HookCaller, default_subprocess_runner
 from pep517.wrappers import UnsupportedOperation, BackendUnavailable
@@ -131,3 +132,21 @@ def test_runner_replaced_on_exception(monkeypatch):
 
     hooks.get_requires_for_build_wheel()
     runner.assert_called_once()
+
+
+@pytest.mark.parametrize('exe', [None, 'demo'])
+def test_set_executable_default(exe):
+    hooks = get_hooks('pkg1')
+    if exe is not None:
+        hooks.executable = exe
+    from pep517.wrappers import compat
+
+    with patch.object(hooks, '_subprocess_runner') as runner:
+        json = {'return_val': 'A'}
+        with patch.object(compat, 'read_json', return_value=json):
+            res = hooks.get_requires_for_build_wheel({})
+            assert res == 'A'
+    runner.assert_called_once()
+    args = runner.call_args[0]
+    expected = sys.executable if exe is None else exe
+    assert args[0][0] == expected
