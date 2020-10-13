@@ -115,8 +115,8 @@ class Pep517HookCaller(object):
     build_backend : The build backend spec, as per PEP 517, from
         pyproject.toml.
     backend_path : The backend path, as per PEP 517, from pyproject.toml.
-    executable: The path to the isolated python executable to run within
     runner : A callable that invokes the wrapper subprocess.
+    executable: The path to the isolated python executable to run within
 
     The 'runner', if provided, must expect the following:
         cmd : a list of strings representing the command and arguments to
