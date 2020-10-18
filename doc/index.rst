@@ -8,6 +8,7 @@ This package provides an API to call the hooks defined in :pep:`517`.
    :caption: Contents:
 
    callhooks
+   changelog
 
 
 

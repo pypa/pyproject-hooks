@@ -3,6 +3,9 @@ API reference
 
 .. module:: pep517
 
+Calling the build system
+------------------------
+
 .. autoclass:: Pep517HookCaller
 
    .. automethod:: get_requires_for_build_sdist
