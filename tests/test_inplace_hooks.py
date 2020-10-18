@@ -7,6 +7,7 @@ from pep517.wrappers import Pep517HookCaller, BackendInvalid
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
+SOURCE_DIR = pjoin(SAMPLES_DIR, 'pkg1')
 
 
 def get_hooks(pkg, backend=None, path=None):
@@ -20,19 +21,24 @@ def get_hooks(pkg, backend=None, path=None):
     return Pep517HookCaller(source_dir, backend, path)
 
 
-def test_backend_path_within_tree():
-    source_dir = pjoin(SAMPLES_DIR, 'pkg1')
-    assert Pep517HookCaller(source_dir, 'dummy', ['.', 'subdir'])
-    assert Pep517HookCaller(source_dir, 'dummy', ['../pkg1', 'subdir/..'])
+@pytest.mark.parametrize('backend_path', [
+    ['.', 'subdir'],
+    ['../pkg1', 'subdir/..'],
+])
+def test_backend_path_within_tree(backend_path):
+    Pep517HookCaller(SOURCE_DIR, 'dummy', backend_path)
+
+
+@pytest.mark.parametrize('backend_path', [
+    [SOURCE_DIR],
+    ['.', '..'],
+    ['subdir/../..'],
+    ['/'],
+])
+def test_backend_out_of_tree(backend_path):
     # TODO: Do we want to insist on ValueError, or invent another exception?
     with pytest.raises(Exception):
-        assert Pep517HookCaller(source_dir, 'dummy', [source_dir])
-    with pytest.raises(Exception):
-        Pep517HookCaller(source_dir, 'dummy', ['.', '..'])
-    with pytest.raises(Exception):
-        Pep517HookCaller(source_dir, 'dummy', ['subdir/../..'])
-    with pytest.raises(Exception):
-        Pep517HookCaller(source_dir, 'dummy', ['/'])
+        Pep517HookCaller(SOURCE_DIR, 'dummy', backend_path)
 
 
 def test_intree_backend():
