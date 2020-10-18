@@ -26,7 +26,7 @@ def get_hooks(pkg, backend=None, path=None):
     ['../pkg1', 'subdir/..'],
 ])
 def test_backend_path_within_tree(backend_path):
-    assert Pep517HookCaller(SOURCE_DIR, 'dummy', backend_path)
+    Pep517HookCaller(SOURCE_DIR, 'dummy', backend_path)
 
 
 @pytest.mark.parametrize('backend_path', [
