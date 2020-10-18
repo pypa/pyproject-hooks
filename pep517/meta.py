@@ -17,9 +17,9 @@ except ImportError:
     from zipp import Path
 
 from .envbuild import BuildEnvironment
-from pep517 import Pep517HookCaller, quiet_subprocess_runner
-from pep517.pyproject import validate_system, load_system, compat_system
+from .wrappers import Pep517HookCaller, quiet_subprocess_runner
 from .dirtools import tempdir, mkdir_p, dir_to_zipfile
+from .build import validate_system, load_system, compat_system
 
 log = logging.getLogger(__name__)
 

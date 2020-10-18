@@ -1,3 +1,4 @@
+import threading
 from contextlib import contextmanager
 import os
 from os.path import dirname, abspath, join as pjoin
@@ -8,6 +9,7 @@ from tempfile import mkdtemp
 
 from . import compat
 
+
 try:
     import importlib.resources as resources
 
@@ -17,17 +19,6 @@ except ImportError:
     @contextmanager
     def _in_proc_script_path():
         yield pjoin(dirname(abspath(__file__)), '_in_process.py')
-
-
-__all__ = [
-    'Pep517HookCaller',
-    'BackendUnavailable',
-    'BackendInvalid',
-    'HookMissing',
-    'UnsupportedOperation',
-    'default_subprocess_runner',
-    'quiet_subprocess_runner',
-]
 
 
 @contextmanager
@@ -281,3 +272,37 @@ class Pep517HookCaller(object):
             if data.get('hook_missing'):
                 raise HookMissing(hook_name)
             return data['return_val']
+
+
+class LoggerWrapper(threading.Thread):
+    """
+    Read messages from a pipe and redirect them
+    to a logger (see python's logging module).
+    """
+
+    def __init__(self, logger, level):
+        threading.Thread.__init__(self)
+        self.daemon = True
+
+        self.logger = logger
+        self.level = level
+
+        # create the pipe and reader
+        self.fd_read, self.fd_write = os.pipe()
+        self.reader = os.fdopen(self.fd_read)
+
+        self.start()
+
+    def fileno(self):
+        return self.fd_write
+
+    @staticmethod
+    def remove_newline(msg):
+        return msg[:-1] if msg.endswith(os.linesep) else msg
+
+    def run(self):
+        for line in self.reader:
+            self._write(self.remove_newline(line))
+
+    def _write(self, message):
+        self.logger.log(self.level, message)

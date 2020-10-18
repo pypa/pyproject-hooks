@@ -14,7 +14,7 @@ import zipfile
 
 from .colorlog import enable_colourful_output
 from .envbuild import BuildEnvironment
-from pep517 import Pep517HookCaller
+from .wrappers import Pep517HookCaller
 
 log = logging.getLogger(__name__)
 
