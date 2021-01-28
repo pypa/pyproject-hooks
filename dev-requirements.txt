@@ -1,6 +1,6 @@
 pytest
 pytest-flake8
-mock
+mock ; python_version<'3.6'
 testpath
 toml
 setuptools>=30
