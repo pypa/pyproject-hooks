@@ -4,3 +4,4 @@ __pycache__/
 .tox
 .pytest_cache
 doc/_build/
+*.egg-info/
