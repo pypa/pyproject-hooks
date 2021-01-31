@@ -1,7 +1,7 @@
 import threading
 from contextlib import contextmanager
 import os
-from os.path import dirname, abspath, join as pjoin
+from os.path import abspath, join as pjoin
 import shutil
 from subprocess import check_call, check_output, STDOUT
 import sys
