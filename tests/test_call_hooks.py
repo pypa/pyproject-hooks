@@ -8,7 +8,10 @@ import toml
 import zipfile
 import sys
 
-from mock import Mock
+try:
+    from mock import Mock  # Prefer the backport below python 3.6
+except ImportError:
+    from unittest.mock import Mock
 
 from pep517.wrappers import Pep517HookCaller, default_subprocess_runner
 from pep517.wrappers import UnsupportedOperation, BackendUnavailable
