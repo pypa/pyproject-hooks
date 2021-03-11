@@ -1,3 +1,8 @@
+"""This is a subpackage because the directory is on sys.path for _in_process.py
+
+The subpackage should stay as empty as possible to avoid shadowing modules that
+the backend might import.
+"""
 from os.path import dirname, abspath, join as pjoin
 from contextlib import contextmanager
 
