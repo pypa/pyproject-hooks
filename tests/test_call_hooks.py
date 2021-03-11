@@ -164,4 +164,7 @@ def test_issue_104():
             hooks.get_requires_for_build_wheel({})
         with open(pjoin(outdir, 'out.json')) as f:
             children = json.load(f)
-    assert set(children) <= {'__init__.py', '_in_process.py', '__pycache__'}
+    assert set(children) <= {
+        '__init__.py', '__init__.pyc', '_in_process.py', '_in_process.pyc',
+        '__pycache__',
+    }
