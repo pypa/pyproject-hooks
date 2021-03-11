@@ -7,6 +7,7 @@ import pytest
 import toml
 import zipfile
 import sys
+import json
 
 try:
     from mock import Mock  # Prefer the backport below python 3.6
@@ -154,3 +155,19 @@ def test_custom_python_executable(monkeypatch, tmpdir):
             hooks.get_requires_for_build_wheel()
         runner.assert_called_once()
         assert runner.call_args[0][0][0] == 'some-python'
+
+
+def test_issue_104():
+    hooks = get_hooks('test-for-issue-104')
+    with TemporaryDirectory() as outdir:
+        with modified_env({
+            'PYTHONPATH': BUILDSYS_PKGS,
+            'PEP517_ISSUE104_OUTDIR': outdir,
+        }):
+            hooks.get_requires_for_build_wheel({})
+        with open(pjoin(outdir, 'out.json')) as f:
+            children = json.load(f)
+    assert set(children) <= {
+        '__init__.py', '__init__.pyc', '_in_process.py', '_in_process.pyc',
+        '__pycache__',
+    }
