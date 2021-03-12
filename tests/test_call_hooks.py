@@ -177,4 +177,5 @@ def test_setup_py():
     hooks = get_hooks('setup-py')
     with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
         res = hooks.get_requires_for_build_wheel({})
+    res = [x for x in res if x != 'setuptools']
     assert res == ['wheel']
