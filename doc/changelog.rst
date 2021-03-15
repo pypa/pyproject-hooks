@@ -1,6 +1,23 @@
 Changelog
 =========
 
+0.10
+----
+
+- Avoid shadowing imports such as ``colorlog`` in the backend, by moving the
+  ``_in_process.py`` script into a separate subpackage.
+- Issue warnings when using the deprecated ``pep517.build`` and
+  ``pep517.check`` modules at the command line. See the `PyPA build project
+  <https://github.com/pypa/build>`_ for a replacement.
+- Allow building with flit_core 3.x.
+- Prefer the standard library ``unittest.mock`` to ``mock`` for tests on Python
+  3.6 and above.
+
+0.9.1
+-----
+
+- Silence some static analysis warnings.
+
 0.9
 ---
 
