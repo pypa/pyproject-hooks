@@ -234,6 +234,59 @@ class Pep517HookCaller(object):
             'config_settings': config_settings,
         })
 
+    def get_requires_for_build_editable(self, config_settings=None):
+        """Identify packages required for building a editable
+
+        Returns a list of dependency specifications, e.g.::
+
+            ["wheel >= 0.25", "setuptools"]
+
+        This does not include requirements specified in pyproject.toml.
+        It returns the result of calling the equivalently named hook in a
+        subprocess.
+        """
+        return self._call_hook('get_requires_for_build_editable', {
+            'config_settings': config_settings
+        })
+
+    def prepare_metadata_for_build_editable(
+            self, metadata_directory, config_settings=None,
+            _allow_fallback=True):
+        """Prepare a ``*.dist-info`` folder with metadata for this project.
+
+        Returns the name of the newly created folder.
+
+        If the build backend defines a hook with this name, it will be called
+        in a subprocess. If not, the backend will be asked to build a wheel,
+        and the dist-info extracted from that (unless _allow_fallback is
+        False).
+        """
+        return self._call_hook('prepare_metadata_for_build_editable', {
+            'metadata_directory': abspath(metadata_directory),
+            'config_settings': config_settings,
+            '_allow_fallback': _allow_fallback,
+        })
+
+    def build_editable(
+            self, wheel_directory, config_settings=None,
+            metadata_directory=None):
+        """Build a wheel from this project.
+
+        Returns the name of the newly created file.
+
+        In general, this will call the 'build_editable' hook in the backend.
+        However, if that was previously called by
+        'prepare_metadata_for_build_editable', and the same metadata_directory is
+        used, the previously built wheel will be copied to wheel_directory.
+        """
+        if metadata_directory is not None:
+            metadata_directory = abspath(metadata_directory)
+        return self._call_hook('build_editable', {
+            'wheel_directory': abspath(wheel_directory),
+            'config_settings': config_settings,
+            'metadata_directory': metadata_directory,
+        })
+
     def _call_hook(self, hook_name, kwargs):
         # On Python 2, pytoml returns Unicode values (which is correct) but the
         # environment passed to check_call needs to contain string values. We

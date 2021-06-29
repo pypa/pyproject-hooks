@@ -149,14 +149,19 @@ def _dist_info_files(whl_zip):
 
 
 def _get_wheel_metadata_from_wheel(
-        backend, metadata_directory, config_settings):
+        backend, metadata_directory, config_settings, editable=False):
     """Build a wheel and extract the metadata from it.
 
     Fallback for when the build backend does not
-    define the 'get_wheel_metadata' hook.
+    define the 'prepare_metadata' hook.
     """
     from zipfile import ZipFile
-    whl_basename = backend.build_wheel(metadata_directory, config_settings)
+    if editable:
+        whl_basename = backend.build_editable(
+            metadata_directory, config_settings)
+    else:
+        whl_basename = backend.build_wheel(
+            metadata_directory, config_settings)
     with open(os.path.join(metadata_directory, WHEEL_BUILT_MARKER), 'wb'):
         pass  # Touch marker file
 
@@ -167,7 +172,7 @@ def _get_wheel_metadata_from_wheel(
     return dist_info[0].split('/')[0]
 
 
-def _find_already_built_wheel(metadata_directory):
+def _find_already_built_wheel(metadata_directory, editable=False):
     """Check for a wheel already built during the get_wheel_metadata hook.
     """
     if not metadata_directory:
@@ -181,8 +186,9 @@ def _find_already_built_wheel(metadata_directory):
         print('Found wheel built marker, but no .whl files')
         return None
     if len(whl_files) > 1:
+        hook_name = 'build_editable' if editable else 'build_wheel'
         print('Found multiple .whl files; unspecified behaviour. '
-              'Will call build_wheel.')
+              'Will call {}.'.format(hook_name))
         return None
 
     # Exactly one .whl file
@@ -206,13 +212,64 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
 
 
 def get_requires_for_build_sdist(config_settings):
-    """Invoke the optional get_requires_for_build_wheel hook
+    """Invoke the optional get_requires_for_build_sdist hook
 
     Returns [] if the hook is not defined.
     """
     backend = _build_backend()
     try:
         hook = backend.get_requires_for_build_sdist
+    except AttributeError:
+        return []
+    else:
+        return hook(config_settings)
+
+
+def prepare_metadata_for_build_editable(
+        metadata_directory, config_settings, _allow_fallback):
+    """Invoke optional prepare_metadata_for_build_editable
+
+    Implements a fallback by building a wheel for editable if the hook
+    isn't defined, unless _allow_fallback is False in which case
+    HookMissing is raised.
+    """
+    backend = _build_backend()
+    try:
+        hook = backend.prepare_metadata_for_build_editable
+    except AttributeError:
+        if not _allow_fallback:
+            raise HookMissing()
+        return _get_wheel_metadata_from_wheel(backend, metadata_directory,
+                                              config_settings, editable=True)
+    else:
+        return hook(metadata_directory, config_settings)
+
+
+def build_editable(wheel_directory, config_settings, metadata_directory=None):
+    """Invoke the optional build_editable hook.
+    """
+    prebuilt_whl = _find_already_built_wheel(metadata_directory, editable=True)
+    if prebuilt_whl:
+        shutil.copy2(prebuilt_whl, wheel_directory)
+        return os.path.basename(prebuilt_whl)
+
+    backend = _build_backend()
+    try:
+        hook = backend.build_wheel_for_editable
+    except AttributeError:
+        raise HookMissing()
+    else:
+        return hook(wheel_directory, config_settings, metadata_directory)
+
+
+def get_requires_for_build_editable(config_settings):
+    """Invoke the optional get_requires_for_build_editable hook
+
+    Returns [] if the hook is not defined.
+    """
+    backend = _build_backend()
+    try:
+        hook = backend.get_requires_for_build_editable
     except AttributeError:
         return []
     else:
@@ -244,6 +301,9 @@ HOOK_NAMES = {
     'build_wheel',
     'get_requires_for_build_sdist',
     'build_sdist',
+    'get_requires_for_build_editable',
+    'prepare_metadata_for_build_editable',
+    'build_editable',
 }
 
 
