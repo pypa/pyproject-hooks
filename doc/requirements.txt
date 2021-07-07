@@ -1,1 +1,2 @@
-toml
+toml ; python_version<'3.6'
+tomli ; python_version>='3.6'

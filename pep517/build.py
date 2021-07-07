@@ -3,13 +3,12 @@
 import argparse
 import logging
 import os
-import toml
 import shutil
 
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
 from .dirtools import tempdir, mkdir_p
-from .compat import FileNotFoundError
+from .compat import FileNotFoundError, toml_load
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +31,7 @@ def load_system(source_dir):
     """
     pyproject = os.path.join(source_dir, 'pyproject.toml')
     with open(pyproject) as f:
-        pyproject_data = toml.load(f)
+        pyproject_data = toml_load(f)
     return pyproject_data['build-system']
 
 

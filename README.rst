@@ -19,12 +19,12 @@ Usage—you are responsible for ensuring build requirements are available:
 .. code-block:: python
 
     import os
-    import toml
+    import tomli
     from pep517.wrappers import Pep517HookCaller
 
     src = 'path/to/source'  # Folder containing 'pyproject.toml'
     with open(os.path.join(src, 'pyproject.toml')) as f:
-        build_sys = toml.load(f)['build-system']
+        build_sys = tomli.load(f)['build-system']
 
     print(build_sys['requires'])  # List of static requirements
     # The caller is responsible for installing these and running the hooks in
