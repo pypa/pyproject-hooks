@@ -114,6 +114,20 @@ def get_requires_for_build_wheel(config_settings):
         return hook(config_settings)
 
 
+def get_requires_for_build_editable(config_settings):
+    """Invoke the optional get_requires_for_build_editable hook
+
+    Returns [] if the hook is not defined.
+    """
+    backend = _build_backend()
+    try:
+        hook = backend.get_requires_for_build_editable
+    except AttributeError:
+        return []
+    else:
+        return hook(config_settings)
+
+
 def prepare_metadata_for_build_wheel(
         metadata_directory, config_settings, _allow_fallback):
     """Invoke optional prepare_metadata_for_build_wheel
@@ -128,6 +142,28 @@ def prepare_metadata_for_build_wheel(
         if not _allow_fallback:
             raise HookMissing()
         whl_basename = backend.build_wheel(metadata_directory, config_settings)
+        return _get_wheel_metadata_from_wheel(whl_basename, metadata_directory,
+                                              config_settings)
+    else:
+        return hook(metadata_directory, config_settings)
+
+
+def prepare_metadata_for_build_editable(
+        metadata_directory, config_settings, _allow_fallback):
+    """Invoke optional prepare_metadata_for_build_editable
+
+    Implements a fallback by building an editable wheel if the hook isn't
+    defined, unless _allow_fallback is False in which case HookMissing is
+    raised.
+    """
+    backend = _build_backend()
+    try:
+        hook = backend.prepare_metadata_for_build_editable
+    except AttributeError:
+        if not _allow_fallback:
+            raise HookMissing()
+        whl_basename = backend.build_editable(metadata_directory,
+                                              config_settings)
         return _get_wheel_metadata_from_wheel(whl_basename, metadata_directory,
                                               config_settings)
     else:
@@ -205,6 +241,27 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
                                         metadata_directory)
 
 
+def build_editable(wheel_directory, config_settings, metadata_directory=None):
+    """Invoke the optional build_editable hook.
+
+    If a wheel was already built in the
+    prepare_metadata_for_build_editable fallback, this
+    will copy it rather than rebuilding the wheel.
+    """
+    backend = _build_backend()
+    try:
+        hook = backend.build_editable
+    except AttributeError:
+        raise HookMissing()
+    else:
+        prebuilt_whl = _find_already_built_wheel(metadata_directory)
+        if prebuilt_whl:
+            shutil.copy2(prebuilt_whl, wheel_directory)
+            return os.path.basename(prebuilt_whl)
+
+        return hook(wheel_directory, config_settings, metadata_directory)
+
+
 def get_requires_for_build_sdist(config_settings):
     """Invoke the optional get_requires_for_build_wheel hook
 
@@ -242,6 +299,9 @@ HOOK_NAMES = {
     'get_requires_for_build_wheel',
     'prepare_metadata_for_build_wheel',
     'build_wheel',
+    'get_requires_for_build_editable',
+    'prepare_metadata_for_build_editable',
+    'build_editable',
     'get_requires_for_build_sdist',
     'build_sdist',
 }

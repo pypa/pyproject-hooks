@@ -4,8 +4,11 @@ API to call PEP 517 hooks
 `PEP 517 <https://www.python.org/dev/peps/pep-0517/>`_ specifies a standard
 API for systems which build Python packages.
 
-This package contains wrappers around the hooks specified by PEP 517. It
-provides:
+`PEP 660 <https://www.python.org/dev/peps/pep-0660/>`_ extends it with a build
+mode that leads to editable installs.
+
+This package contains wrappers around the hooks specified by PEP 517 and
+PEP 660. It provides:
 
 - A mechanism to call the hooks in a subprocess, so they are isolated from
   the current process.
