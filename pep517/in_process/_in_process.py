@@ -127,7 +127,8 @@ def prepare_metadata_for_build_wheel(
     except AttributeError:
         if not _allow_fallback:
             raise HookMissing()
-        return _get_wheel_metadata_from_wheel(backend, metadata_directory,
+        whl_basename = backend.build_wheel(metadata_directory, config_settings)
+        return _get_wheel_metadata_from_wheel(whl_basename, metadata_directory,
                                               config_settings)
     else:
         return hook(metadata_directory, config_settings)
@@ -149,14 +150,13 @@ def _dist_info_files(whl_zip):
 
 
 def _get_wheel_metadata_from_wheel(
-        backend, metadata_directory, config_settings):
-    """Build a wheel and extract the metadata from it.
+        whl_basename, metadata_directory, config_settings):
+    """Extract the metadata from a wheel.
 
     Fallback for when the build backend does not
     define the 'get_wheel_metadata' hook.
     """
     from zipfile import ZipFile
-    whl_basename = backend.build_wheel(metadata_directory, config_settings)
     with open(os.path.join(metadata_directory, WHEEL_BUILT_MARKER), 'wb'):
         pass  # Touch marker file
 
