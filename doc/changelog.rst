@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.11 (unreleased)
+-----------------
+
+- Support editable hooks (`PEP 660 <https://www.python.org/dev/peps/pep-0660/>`_).
+
 0.10
 ----
 
