@@ -63,6 +63,9 @@ class BackendInvalid(Exception):
 
 class HookMissing(Exception):
     """Raised if a hook is missing and we are not executing the fallback"""
+    def __init__(self, hook_name=None):
+        super(HookMissing, self).__init__(hook_name)
+        self.hook_name = hook_name
 
 
 def contained_in(filename, directory):
@@ -162,10 +165,15 @@ def prepare_metadata_for_build_editable(
     except AttributeError:
         if not _allow_fallback:
             raise HookMissing()
-        whl_basename = backend.build_editable(metadata_directory,
-                                              config_settings)
-        return _get_wheel_metadata_from_wheel(whl_basename, metadata_directory,
-                                              config_settings)
+        try:
+            build_hook = backend.build_editable
+        except AttributeError:
+            raise HookMissing(hook_name='build_editable')
+        else:
+            whl_basename = build_hook(metadata_directory, config_settings)
+            return _get_wheel_metadata_from_wheel(whl_basename,
+                                                  metadata_directory,
+                                                  config_settings)
     else:
         return hook(metadata_directory, config_settings)
 
@@ -330,8 +338,9 @@ def main():
     except GotUnsupportedOperation as e:
         json_out['unsupported'] = True
         json_out['traceback'] = e.traceback
-    except HookMissing:
+    except HookMissing as e:
         json_out['hook_missing'] = True
+        json_out['missing_hook_name'] = e.hook_name or hook_name
 
     write_json(json_out, pjoin(control_dir, 'output.json'), indent=2)
 

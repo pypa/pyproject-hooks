@@ -333,7 +333,7 @@ class Pep517HookCaller(object):
                     message=data.get('backend_error', '')
                 )
             if data.get('hook_missing'):
-                raise HookMissing(hook_name)
+                raise HookMissing(data.get('missing_hook_name') or hook_name)
             return data['return_val']
 
 
