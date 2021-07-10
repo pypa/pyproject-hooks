@@ -14,9 +14,16 @@ def get_requires_for_build_wheel(config_settings):
     return ['wheelwright']
 
 
+def get_requires_for_build_editable(config_settings):
+    return ['wheelwright', 'editables']
+
+
 def prepare_metadata_for_build_wheel(metadata_directory, config_settings):
     for distinfo in glob('*.dist-info'):
         shutil.copytree(distinfo, pjoin(metadata_directory, distinfo))
+
+
+prepare_metadata_for_build_editable = prepare_metadata_for_build_wheel
 
 
 def prepare_build_wheel_files(build_directory, config_settings):
@@ -35,6 +42,9 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
         for metadata in glob('*.dist-info/*'):
             zf.write(metadata)
     return whl_file
+
+
+build_editable = build_wheel
 
 
 def get_requires_for_build_sdist(config_settings):

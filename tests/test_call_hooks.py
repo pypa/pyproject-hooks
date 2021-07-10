@@ -49,6 +49,13 @@ def test_get_requires_for_build_wheel():
     assert res == ['wheelwright']
 
 
+def test_get_requires_for_build_editable():
+    hooks = get_hooks('pkg1')
+    with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
+        res = hooks.get_requires_for_build_editable({})
+    assert res == ['wheelwright', 'editables']
+
+
 def test_get_requires_for_build_sdist():
     hooks = get_hooks('pkg1')
     with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
@@ -65,11 +72,34 @@ def test_prepare_metadata_for_build_wheel():
         assert_isfile(pjoin(metadatadir, 'pkg1-0.5.dist-info', 'METADATA'))
 
 
+def test_prepare_metadata_for_build_editable():
+    hooks = get_hooks('pkg1')
+    with TemporaryDirectory() as metadatadir:
+        with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
+            hooks.prepare_metadata_for_build_editable(metadatadir, {})
+
+        assert_isfile(pjoin(metadatadir, 'pkg1-0.5.dist-info', 'METADATA'))
+
+
 def test_build_wheel():
     hooks = get_hooks('pkg1')
     with TemporaryDirectory() as builddir:
         with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
             whl_file = hooks.build_wheel(builddir, {})
+
+        assert whl_file.endswith('.whl')
+        assert os.sep not in whl_file
+
+        whl_file = pjoin(builddir, whl_file)
+        assert_isfile(whl_file)
+        assert zipfile.is_zipfile(whl_file)
+
+
+def test_build_editable():
+    hooks = get_hooks('pkg1')
+    with TemporaryDirectory() as builddir:
+        with modified_env({'PYTHONPATH': BUILDSYS_PKGS}):
+            whl_file = hooks.build_editable(builddir, {})
 
         assert whl_file.endswith('.whl')
         assert os.sep not in whl_file
