@@ -1,3 +1,4 @@
+import io
 from os.path import dirname, abspath, join as pjoin
 import pytest
 import toml
@@ -12,7 +13,7 @@ BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
 
 def get_hooks(pkg):
     source_dir = pjoin(SAMPLES_DIR, pkg)
-    with open(pjoin(source_dir, 'pyproject.toml')) as f:
+    with io.open(pjoin(source_dir, 'pyproject.toml'), encoding="utf-8") as f:
         data = toml.load(f)
     return Pep517HookCaller(source_dir, data['build-system']['build-backend'])
 

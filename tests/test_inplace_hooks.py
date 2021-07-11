@@ -1,3 +1,4 @@
+import io
 from os.path import dirname, abspath, join as pjoin
 import toml
 from testpath import modified_env
@@ -12,7 +13,7 @@ SOURCE_DIR = pjoin(SAMPLES_DIR, 'pkg1')
 
 def get_hooks(pkg, backend=None, path=None):
     source_dir = pjoin(SAMPLES_DIR, pkg)
-    with open(pjoin(source_dir, 'pyproject.toml')) as f:
+    with io.open(pjoin(source_dir, 'pyproject.toml'), encoding="utf-8") as f:
         data = toml.load(f)
     if backend is None:
         backend = data['build-system']['build-backend']
