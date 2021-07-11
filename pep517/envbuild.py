@@ -18,9 +18,9 @@ log = logging.getLogger(__name__)
 
 def _load_pyproject(source_dir):
     with io.open(
-        os.path.join(source_dir, 'pyproject.toml'),
-        encoding="utf-8",
-        ) as f:
+            os.path.join(source_dir, 'pyproject.toml'),
+            encoding="utf-8",
+            ) as f:
         pyproject_data = toml.load(f)
     buildsys = pyproject_data['build-system']
     return (
