@@ -5,7 +5,6 @@ import io
 import logging
 import os
 from os.path import isfile, join as pjoin
-from toml import TomlDecodeError, load as toml_load
 import shutil
 from subprocess import CalledProcessError
 import sys
@@ -14,6 +13,7 @@ from tempfile import mkdtemp
 import zipfile
 
 from .colorlog import enable_colourful_output
+from .compat import TOMLDecodeError, toml_load
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
 
@@ -150,7 +150,7 @@ def check(source_dir):
         backend = buildsys['build-backend']
         backend_path = buildsys.get('backend-path')
         log.info('Loaded pyproject.toml')
-    except (TomlDecodeError, KeyError):
+    except (TOMLDecodeError, KeyError):
         log.error("Invalid pyproject.toml", exc_info=True)
         return False
 

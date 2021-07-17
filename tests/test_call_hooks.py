@@ -5,7 +5,6 @@ import tarfile
 from testpath import modified_env, assert_isfile
 from testpath.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
 import pytest
-import toml
 import zipfile
 import sys
 import json
@@ -15,6 +14,7 @@ try:
 except ImportError:
     from unittest.mock import Mock
 
+from pep517.compat import toml_load
 from pep517.wrappers import Pep517HookCaller, default_subprocess_runner
 from pep517.wrappers import UnsupportedOperation, BackendUnavailable
 
@@ -30,7 +30,7 @@ BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
 def get_hooks(pkg, **kwargs):
     source_dir = pjoin(SAMPLES_DIR, pkg)
     with io.open(pjoin(source_dir, 'pyproject.toml'), encoding="utf-8") as f:
-        data = toml.load(f)
+        data = toml_load(f)
     return Pep517HookCaller(
         source_dir, data['build-system']['build-backend'], **kwargs
     )

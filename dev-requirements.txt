@@ -2,7 +2,8 @@ pytest
 pytest-flake8
 mock ; python_version<'3.6'
 testpath
-toml
+toml ; python_version<'3.6'
+tomli ; python_version>='3.6'
 setuptools>=30
 importlib_metadata ; python_version<'3.8'
 zipp ; python_version<'3.8'

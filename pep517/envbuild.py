@@ -4,13 +4,13 @@
 import io
 import os
 import logging
-import toml
 import shutil
 from subprocess import check_call
 import sys
 from sysconfig import get_paths
 from tempfile import mkdtemp
 
+from .compat import toml_load
 from .wrappers import Pep517HookCaller, LoggerWrapper
 
 log = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ def _load_pyproject(source_dir):
             os.path.join(source_dir, 'pyproject.toml'),
             encoding="utf-8",
             ) as f:
-        pyproject_data = toml.load(f)
+        pyproject_data = toml_load(f)
     buildsys = pyproject_data['build-system']
     return (
         buildsys['requires'],

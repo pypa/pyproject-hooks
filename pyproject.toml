@@ -9,7 +9,8 @@ author-email = "thomas@kluyver.me.uk"
 home-page = "https://github.com/pypa/pep517"
 description-file = "README.rst"
 requires = [
-    "toml",
+    "toml;python_version<'3.6'",
+    "tomli;python_version>='3.6'",
     "importlib_metadata;python_version<'3.8'",
     "zipp;python_version<'3.8'",
 ]
