@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.11
+----
+
+- Use the TOML 1.0 compliant ``tomli`` parser module on Python 3.6 and above.
+- Switch CI to Github actions.
+
 0.10
 ----
 
