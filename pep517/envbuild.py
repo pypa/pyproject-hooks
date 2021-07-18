@@ -1,6 +1,7 @@
 """Build wheels/sdists by installing build deps to a temporary environment.
 """
 
+import io
 import os
 import logging
 import shutil
@@ -16,7 +17,10 @@ log = logging.getLogger(__name__)
 
 
 def _load_pyproject(source_dir):
-    with open(os.path.join(source_dir, 'pyproject.toml')) as f:
+    with io.open(
+            os.path.join(source_dir, 'pyproject.toml'),
+            encoding="utf-8",
+            ) as f:
         pyproject_data = toml_load(f)
     buildsys = pyproject_data['build-system']
     return (

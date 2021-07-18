@@ -1,3 +1,7 @@
 [build-system]
 requires = ["eg_buildsys"]
 build-backend = "buildsys"
+
+[project]
+description = "Factory ⸻ A code generator 🏭"
+maintainers = [{name = "Łukasz Langa"}]

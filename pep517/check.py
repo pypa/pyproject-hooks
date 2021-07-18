@@ -1,6 +1,7 @@
 """Check a project and backend by attempting to build using PEP 517 hooks.
 """
 import argparse
+import io
 import logging
 import os
 from os.path import isfile, join as pjoin
@@ -141,7 +142,7 @@ def check(source_dir):
         return False
 
     try:
-        with open(pyproject) as f:
+        with io.open(pyproject, encoding="utf-8") as f:
             pyproject_data = toml_load(f)
         # Ensure the mandatory data can be loaded
         buildsys = pyproject_data['build-system']
