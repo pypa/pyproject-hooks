@@ -12,11 +12,17 @@ Calling the build system
 
    .. automethod:: get_requires_for_build_wheel
 
+   .. automethod:: get_requires_for_build_editable
+
    .. automethod:: prepare_metadata_for_build_wheel
+
+   .. automethod:: prepare_metadata_for_build_editable
 
    .. automethod:: build_sdist
 
    .. automethod:: build_wheel
+
+   .. automethod:: build_editable
 
    .. automethod:: subprocess_runner
 

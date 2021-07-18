@@ -4,6 +4,7 @@ Changelog
 0.11
 ----
 
+- Support editable hooks (`PEP 660 <https://www.python.org/dev/peps/pep-0660/>`_).
 - Use the TOML 1.0 compliant ``tomli`` parser module on Python 3.6 and above.
 - Ensure TOML files are always read as UTF-8.
 - Switch CI to Github actions.
