@@ -5,6 +5,7 @@ Changelog
 ----
 
 - Use the TOML 1.0 compliant ``tomli`` parser module on Python 3.6 and above.
+- Ensure TOML files are always read as UTF-8.
 - Switch CI to Github actions.
 
 0.10
