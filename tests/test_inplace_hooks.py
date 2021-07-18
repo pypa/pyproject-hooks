@@ -1,8 +1,9 @@
+import io
 from os.path import dirname, abspath, join as pjoin
-import toml
 from testpath import modified_env
 import pytest
 
+from pep517.compat import toml_load
 from pep517.wrappers import Pep517HookCaller, BackendInvalid
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
@@ -12,8 +13,8 @@ SOURCE_DIR = pjoin(SAMPLES_DIR, 'pkg1')
 
 def get_hooks(pkg, backend=None, path=None):
     source_dir = pjoin(SAMPLES_DIR, pkg)
-    with open(pjoin(source_dir, 'pyproject.toml')) as f:
-        data = toml.load(f)
+    with io.open(pjoin(source_dir, 'pyproject.toml'), encoding="utf-8") as f:
+        data = toml_load(f)
     if backend is None:
         backend = data['build-system']['build-backend']
     if path is None:
