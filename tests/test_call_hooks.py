@@ -29,7 +29,7 @@ BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
 
 def get_hooks(pkg, **kwargs):
     source_dir = pjoin(SAMPLES_DIR, pkg)
-    with io.open(pjoin(source_dir, 'pyproject.toml'), encoding="utf-8") as f:
+    with io.open(pjoin(source_dir, 'pyproject.toml'), 'rb') as f:
         data = toml_load(f)
     return Pep517HookCaller(
         source_dir, data['build-system']['build-backend'], **kwargs

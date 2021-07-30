@@ -24,8 +24,5 @@ classifiers = [
 addopts = ["--strict-config", "--strict-markers", "--flake8"]
 xfail_strict = true
 junit_family = "xunit2"
-filterwarnings = [
-    "error",
-    '''ignore:Text file object support is deprecated in favor of binary file objects\. Use `open\("foo.toml", "rb"\)` to open the file in binary mode\.:DeprecationWarning''',
-]
+filterwarnings = ["error"]
 
