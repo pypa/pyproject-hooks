@@ -39,7 +39,7 @@ if sys.version_info < (3, 6):
     from toml import load as _toml_load  # noqa: F401
 
     def toml_load(f):
-        w = io.TextIOWrapper(f, encoding="utf8")
+        w = io.TextIOWrapper(f, encoding="utf8", newline="")
         try:
             return _toml_load(w)
         finally:
