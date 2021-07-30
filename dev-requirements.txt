@@ -1,5 +1,6 @@
 pytest
 pytest-flake8
+pytest-forward-compatibility; python_version<'3'
 mock ; python_version<'3.6'
 testpath
 toml ; python_version<'3.6'
