@@ -10,7 +10,7 @@ home-page = "https://github.com/pypa/pep517"
 description-file = "README.rst"
 requires = [
     "toml;python_version<'3.6'",
-    "tomli;python_version>='3.6'",
+    "tomli >=1.1.0;python_version>='3.6'",
     "importlib_metadata;python_version<'3.8'",
     "zipp;python_version<'3.8'",
 ]
@@ -19,4 +19,3 @@ classifiers = [
     "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
 ]
-
