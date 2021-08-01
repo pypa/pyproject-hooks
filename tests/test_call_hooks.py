@@ -1,4 +1,3 @@
-import io
 import os
 from os.path import dirname, abspath, join as pjoin
 import tarfile
@@ -14,7 +13,7 @@ try:
 except ImportError:
     from unittest.mock import Mock
 
-from pep517.compat import toml_load
+from pep517.compat import read_toml
 from pep517.wrappers import Pep517HookCaller, default_subprocess_runner
 from pep517.wrappers import UnsupportedOperation, BackendUnavailable
 
@@ -29,8 +28,7 @@ BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
 
 def get_hooks(pkg, **kwargs):
     source_dir = pjoin(SAMPLES_DIR, pkg)
-    with io.open(pjoin(source_dir, 'pyproject.toml'), 'rb') as f:
-        data = toml_load(f)
+    data = read_toml(pjoin(source_dir, 'pyproject.toml'))
     return Pep517HookCaller(
         source_dir, data['build-system']['build-backend'], **kwargs
     )

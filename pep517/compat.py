@@ -36,16 +36,21 @@ except NameError:
 
 
 if sys.version_info < (3, 6):
-    from toml import load as _toml_load  # noqa: F401
+    from toml import load as _toml_load_str  # noqa: F401
 
-    def toml_load(f):
+    def _toml_load_bytes(f):
         w = io.TextIOWrapper(f, encoding="utf8", newline="")
         try:
-            return _toml_load(w)
+            return _toml_load_str(w)
         finally:
             w.detach()
 
     from toml import TomlDecodeError as TOMLDecodeError  # noqa: F401
 else:
-    from tomli import load as toml_load  # noqa: F401
+    from tomli import load as _toml_load_bytes  # noqa: F401
     from tomli import TOMLDecodeError  # noqa: F401
+
+
+def read_toml(path):
+    with io.open(path, "rb") as f:
+        return _toml_load_bytes(f)
