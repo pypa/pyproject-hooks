@@ -35,7 +35,10 @@ except NameError:
     FileNotFoundError = IOError
 
 
-if sys.version_info < (3, 6):
+try:
+    from tomli import load as toml_load  # noqa: F401
+    from tomli import TOMLDecodeError  # noqa: F401
+except ImportError:
     from toml import load as _toml_load  # noqa: F401
 
     def toml_load(f):
@@ -46,6 +49,3 @@ if sys.version_info < (3, 6):
             w.detach()
 
     from toml import TomlDecodeError as TOMLDecodeError  # noqa: F401
-else:
-    from tomli import load as toml_load  # noqa: F401
-    from tomli import TOMLDecodeError  # noqa: F401
