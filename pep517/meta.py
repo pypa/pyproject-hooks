@@ -5,6 +5,7 @@ import functools
 import logging
 import os
 import shutil
+import tempfile
 
 try:
     import importlib.metadata as imp_meta
@@ -17,7 +18,7 @@ except ImportError:
     from zipp import Path
 
 from .build import compat_system, load_system, validate_system
-from .dirtools import dir_to_zipfile, mkdir_p, tempdir
+from .dirtools import dir_to_zipfile
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller, quiet_subprocess_runner
 
@@ -31,7 +32,7 @@ def _prep_meta(hooks, env, dest):
     env.pip_install(reqs)
     log.info('Installed dynamic build dependencies')
 
-    with tempdir() as td:
+    with tempfile.TemporaryDirectory() as td:
         log.info('Trying to build metadata in %s', td)
         filename = hooks.prepare_metadata_for_build_wheel(td, {})
         source = os.path.join(td, filename)
@@ -41,7 +42,7 @@ def _prep_meta(hooks, env, dest):
 def build(source_dir='.', dest=None, system=None):
     system = system or load_system(source_dir)
     dest = os.path.join(source_dir, dest or 'dist')
-    mkdir_p(dest)
+    os.makedirs(dest, exist_ok=True)
     validate_system(system)
     hooks = Pep517HookCaller(
         source_dir, system['build-backend'], system.get('backend-path')
@@ -54,7 +55,7 @@ def build(source_dir='.', dest=None, system=None):
 
 
 def build_as_zip(builder=build):
-    with tempdir() as out_dir:
+    with tempfile.TemporaryDirectory() as out_dir:
         builder(dest=out_dir)
         return dir_to_zipfile(out_dir)
 

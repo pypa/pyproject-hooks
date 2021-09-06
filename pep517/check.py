@@ -1,7 +1,6 @@
 """Check a project and backend by attempting to build using PEP 517 hooks.
 """
 import argparse
-import io
 import logging
 import os
 import shutil
@@ -13,8 +12,9 @@ from os.path import join as pjoin
 from subprocess import CalledProcessError
 from tempfile import mkdtemp
 
+import tomli
+
 from .colorlog import enable_colourful_output
-from .compat import TOMLDecodeError, toml_load
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
 
@@ -143,15 +143,15 @@ def check(source_dir):
         return False
 
     try:
-        with io.open(pyproject, 'rb') as f:
-            pyproject_data = toml_load(f)
+        with open(pyproject, 'rb') as f:
+            pyproject_data = tomli.load(f)
         # Ensure the mandatory data can be loaded
         buildsys = pyproject_data['build-system']
         requires = buildsys['requires']
         backend = buildsys['build-backend']
         backend_path = buildsys.get('backend-path')
         log.info('Loaded pyproject.toml')
-    except (TOMLDecodeError, KeyError):
+    except (tomli.TOMLDecodeError, KeyError):
         log.error("Invalid pyproject.toml", exc_info=True)
         return False
 

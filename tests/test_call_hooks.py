@@ -1,22 +1,16 @@
-import io
 import json
 import os
-import sys
 import tarfile
 import zipfile
 from os.path import abspath, dirname
 from os.path import join as pjoin
+from unittest.mock import Mock
 
 import pytest
+import tomli
 from testpath import assert_isfile, modified_env
 from testpath.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
 
-try:
-    from mock import Mock  # Prefer the backport below python 3.6
-except ImportError:
-    from unittest.mock import Mock
-
-from pep517.compat import toml_load
 from pep517.wrappers import (
     BackendUnavailable,
     Pep517HookCaller,
@@ -24,18 +18,14 @@ from pep517.wrappers import (
     default_subprocess_runner,
 )
 
-if sys.version_info[0] == 2:
-    FileNotFoundError = IOError
-
-
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
 
 
 def get_hooks(pkg, **kwargs):
     source_dir = pjoin(SAMPLES_DIR, pkg)
-    with io.open(pjoin(source_dir, 'pyproject.toml'), 'rb') as f:
-        data = toml_load(f)
+    with open(pjoin(source_dir, 'pyproject.toml'), 'rb') as f:
+        data = tomli.load(f)
     return Pep517HookCaller(
         source_dir, data['build-system']['build-backend'], **kwargs
     )
