@@ -211,3 +211,18 @@ def test_setup_py():
     # Some versions of setuptools list setuptools itself here
     res = [x for x in res if x != 'setuptools']
     assert res == ['wheel']
+
+
+@pytest.mark.parametrize(
+    ("pkg", "expected"),
+    [
+        ("pkg1", ["build_editable"]),
+        ("pkg2", []),
+        ("pkg3", ["build_editable"]),
+    ],
+)
+def test__supported_features(pkg, expected):
+    hooks = get_hooks(pkg)
+    with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
+        res = hooks._supported_features()
+    assert res == expected
