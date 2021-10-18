@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.12
+----
+
+- Add method for pip to check if build_editable hook is supported.
+  This is a private API for now.
+
 0.11.1
 ------
 
