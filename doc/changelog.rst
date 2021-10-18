@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.11.1
+------
+
+- Fix DeprecationWarning in tomli.
+
 0.11
 ----
 
