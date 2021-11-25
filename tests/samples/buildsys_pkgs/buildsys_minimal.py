@@ -2,9 +2,9 @@
 
 Don't use this for any real code.
 """
+import tarfile
 from glob import glob
 from os.path import join as pjoin
-import tarfile
 from zipfile import ZipFile
 
 

@@ -3,10 +3,10 @@
 Don't use this for any real code.
 """
 
-from glob import glob
-from os.path import join as pjoin
 import shutil
 import tarfile
+from glob import glob
+from os.path import join as pjoin
 from zipfile import ZipFile
 
 

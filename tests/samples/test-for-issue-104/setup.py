@@ -1,7 +1,8 @@
-import sys
-from setuptools import setup
-from os import path, environ, listdir
 import json
+import sys
+from os import environ, listdir, path
+
+from setuptools import setup
 
 children = listdir(sys.path[0])
 out = path.join(environ['PEP517_ISSUE104_OUTDIR'], 'out.json')

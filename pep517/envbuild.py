@@ -2,16 +2,16 @@
 """
 
 import io
-import os
 import logging
+import os
 import shutil
-from subprocess import check_call
 import sys
+from subprocess import check_call
 from sysconfig import get_paths
 from tempfile import mkdtemp
 
 from .compat import toml_load
-from .wrappers import Pep517HookCaller, LoggerWrapper
+from .wrappers import LoggerWrapper, Pep517HookCaller
 
 log = logging.getLogger(__name__)
 

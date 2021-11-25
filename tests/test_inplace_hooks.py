@@ -1,10 +1,12 @@
 import io
-from os.path import dirname, abspath, join as pjoin
-from testpath import modified_env
+from os.path import abspath, dirname
+from os.path import join as pjoin
+
 import pytest
+from testpath import modified_env
 
 from pep517.compat import toml_load
-from pep517.wrappers import Pep517HookCaller, BackendInvalid
+from pep517.wrappers import BackendInvalid, Pep517HookCaller
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')

@@ -1,7 +1,9 @@
 import io
-from os.path import dirname, abspath, join as pjoin
+from os.path import abspath, dirname
+from os.path import join as pjoin
+
 import pytest
-from testpath import modified_env, assert_isfile
+from testpath import assert_isfile, modified_env
 from testpath.tempdir import TemporaryDirectory
 
 from pep517.compat import toml_load

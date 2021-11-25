@@ -1,11 +1,10 @@
-from __future__ import unicode_literals, absolute_import, division
+from __future__ import absolute_import, division, unicode_literals
 
 import re
 
 import pytest
 
 from pep517 import meta
-
 
 pep517_needs_python_3 = pytest.mark.xfail(
     'sys.version_info < (3,)',

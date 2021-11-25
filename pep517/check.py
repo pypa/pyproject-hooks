@@ -4,13 +4,14 @@ import argparse
 import io
 import logging
 import os
-from os.path import isfile, join as pjoin
 import shutil
-from subprocess import CalledProcessError
 import sys
 import tarfile
-from tempfile import mkdtemp
 import zipfile
+from os.path import isfile
+from os.path import join as pjoin
+from subprocess import CalledProcessError
+from tempfile import mkdtemp
 
 from .colorlog import enable_colourful_output
 from .compat import TOMLDecodeError, toml_load
