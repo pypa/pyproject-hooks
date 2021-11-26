@@ -12,16 +12,16 @@ Results:
 - control_dir/output.json
   - {"return_val": ...}
 """
-from glob import glob
-from importlib import import_module
 import json
 import os
 import os.path
-from os.path import join as pjoin
 import re
 import shutil
 import sys
 import traceback
+from glob import glob
+from importlib import import_module
+from os.path import join as pjoin
 
 # This file is run as a script, and `import compat` is not zip-safe, so we
 # include write_json() and read_json() from compat.py.

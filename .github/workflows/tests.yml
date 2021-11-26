@@ -3,6 +3,23 @@ name: Tests
 on: [push, pull_request]
 
 jobs:
+  isort:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+
+    - name: Install Tox
+      run: |
+        pip install tox tox-venv
+
+    - name: Run tests
+      run: tox -e isort
+
   tests:
     runs-on: ${{ matrix.os }}
     strategy:

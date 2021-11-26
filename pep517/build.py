@@ -6,10 +6,10 @@ import logging
 import os
 import shutil
 
+from .compat import FileNotFoundError, toml_load
+from .dirtools import mkdir_p, tempdir
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
-from .dirtools import tempdir, mkdir_p
-from .compat import FileNotFoundError, toml_load
 
 log = logging.getLogger(__name__)
 

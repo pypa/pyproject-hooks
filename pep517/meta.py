@@ -1,10 +1,10 @@
 """Build metadata for a project using PEP 517 hooks.
 """
 import argparse
+import functools
 import logging
 import os
 import shutil
-import functools
 
 try:
     import importlib.metadata as imp_meta
@@ -16,10 +16,10 @@ try:
 except ImportError:
     from zipp import Path
 
+from .build import compat_system, load_system, validate_system
+from .dirtools import dir_to_zipfile, mkdir_p, tempdir
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller, quiet_subprocess_runner
-from .dirtools import tempdir, mkdir_p, dir_to_zipfile
-from .build import validate_system, load_system, compat_system
 
 log = logging.getLogger(__name__)
 

@@ -3,8 +3,9 @@
 The subpackage should stay as empty as possible to avoid shadowing modules that
 the backend might import.
 """
-from os.path import dirname, abspath, join as pjoin
 from contextlib import contextmanager
+from os.path import abspath, dirname
+from os.path import join as pjoin
 
 try:
     import importlib.resources as resources

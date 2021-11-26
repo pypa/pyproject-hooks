@@ -3,7 +3,6 @@ import io
 import json
 import sys
 
-
 # Handle reading and writing JSON in UTF-8, on Python 3 and 2.
 
 if sys.version_info[0] >= 3:
@@ -47,5 +46,5 @@ if sys.version_info < (3, 6):
 
     from toml import TomlDecodeError as TOMLDecodeError  # noqa: F401
 else:
-    from tomli import load as toml_load  # noqa: F401
     from tomli import TOMLDecodeError  # noqa: F401
+    from tomli import load as toml_load  # noqa: F401

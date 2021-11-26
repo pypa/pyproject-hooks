@@ -1,10 +1,11 @@
+import os
+import shutil
+import sys
 import threading
 from contextlib import contextmanager
-import os
-from os.path import abspath, join as pjoin
-import shutil
-from subprocess import check_call, check_output, STDOUT
-import sys
+from os.path import abspath
+from os.path import join as pjoin
+from subprocess import STDOUT, check_call, check_output
 from tempfile import mkdtemp
 
 from . import compat
