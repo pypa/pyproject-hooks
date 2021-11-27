@@ -1,6 +1,12 @@
 Changelog
 =========
 
+UNRELEASED
+----------
+
+- Remove support for end-of-life Pythons. Now requires Python3.6+.
+- Remove support for ``toml`` package. Now requires ``tomli``.
+
 0.12
 ----
 

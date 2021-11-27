@@ -1,15 +1,6 @@
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 
-import pytest
-
 from pep517 import meta
-
-pep517_needs_python_3 = pytest.mark.xfail(
-    'sys.version_info < (3,)',
-    reason="pep517 cannot be built on Python 2",
-)
 
 
 def test_meta_for_this_package():

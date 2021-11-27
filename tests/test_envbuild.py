@@ -1,16 +1,11 @@
 import tarfile
+import zipfile
 from os.path import abspath, dirname
 from os.path import join as pjoin
+from unittest.mock import call, patch
 
 from testpath import assert_isfile, modified_env
 from testpath.tempdir import TemporaryDirectory
-
-try:
-    from unittest.mock import call, patch
-except ImportError:
-    from mock import patch, call  # Python 2 fallback
-
-import zipfile
 
 from pep517.envbuild import BuildEnvironment, build_sdist, build_wheel
 

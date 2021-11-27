@@ -1,13 +1,13 @@
 """Build a project using PEP 517 hooks.
 """
 import argparse
-import io
 import logging
 import os
 import shutil
+import tempfile
 
-from .compat import FileNotFoundError, toml_load
-from .dirtools import mkdir_p, tempdir
+import tomli
+
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
 
@@ -31,8 +31,8 @@ def load_system(source_dir):
     Load the build system from a source dir (pyproject.toml).
     """
     pyproject = os.path.join(source_dir, 'pyproject.toml')
-    with io.open(pyproject, 'rb') as f:
-        pyproject_data = toml_load(f)
+    with open(pyproject, 'rb') as f:
+        pyproject_data = tomli.load(f)
     return pyproject_data['build-system']
 
 
@@ -64,7 +64,7 @@ def _do_build(hooks, env, dist, dest):
     env.pip_install(reqs)
     log.info('Installed dynamic build dependencies')
 
-    with tempdir() as td:
+    with tempfile.TemporaryDirectory() as td:
         log.info('Trying to build %s in %s', dist, td)
         build_name = 'build_{dist}'.format(**locals())
         build = getattr(hooks, build_name)
@@ -76,7 +76,7 @@ def _do_build(hooks, env, dist, dest):
 def build(source_dir, dist, dest=None, system=None):
     system = system or load_system(source_dir)
     dest = os.path.join(source_dir, dest or 'dist')
-    mkdir_p(dest)
+    os.makedirs(dest, exist_ok=True)
 
     validate_system(system)
     hooks = Pep517HookCaller(
