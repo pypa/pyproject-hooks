@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017-2021 Thomas Kluyver <thomas@kluyver.me.uk> and other contributors
+#
+# SPDX-License-Identifier: MIT
+
 """This is a subpackage because the directory is on sys.path for _in_process.py
 
 The subpackage should stay as empty as possible to avoid shadowing modules that

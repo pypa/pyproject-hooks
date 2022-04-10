@@ -1,6 +1,10 @@
 """Build wheels/sdists by installing build deps to a temporary environment.
 """
 
+# Copyright (c) 2008-2016 The pip developers (see AUTHORS.txt file)
+#
+# SPDX-License-Identifier: MIT
+
 import logging
 import os
 import shutil

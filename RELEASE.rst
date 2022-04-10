@@ -1,3 +1,7 @@
+.. SPDX-FileCopyrightText: 2017-2021 Thomas Kluyver <thomas@kluyver.me.uk> and other contributors
+..
+.. SPDX-License-Identifier: MIT
+
 To cut a release, use
 `bump2version <https://github.com/c4urself/bump2version>`_,
 the `preferred version

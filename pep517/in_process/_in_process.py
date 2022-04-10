@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017-2021 Thomas Kluyver <thomas@kluyver.me.uk> and other contributors
+#
+# SPDX-License-Identifier: MIT
+
 """This is invoked in a subprocess to call the build backend hooks.
 
 It expects:

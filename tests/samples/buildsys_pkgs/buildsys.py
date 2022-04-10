@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017-2021 Thomas Kluyver <thomas@kluyver.me.uk> and other contributors
+#
+# SPDX-License-Identifier: MIT
+
 """This is a very stupid backend for testing purposes.
 
 Don't use this for any real code.
