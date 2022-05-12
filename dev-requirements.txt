@@ -1,4 +1,4 @@
-pytest
+pytest < 7
 pytest-flake8
 flake8 < 4  # https://github.com/tholo/pytest-flake8/issues/81
 testpath
