@@ -6,8 +6,7 @@ import os
 import shutil
 import tempfile
 
-import tomli
-
+from ._compat import tomllib
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
 
@@ -32,7 +31,7 @@ def load_system(source_dir):
     """
     pyproject = os.path.join(source_dir, 'pyproject.toml')
     with open(pyproject, 'rb') as f:
-        pyproject_data = tomli.load(f)
+        pyproject_data = tomllib.load(f)
     return pyproject_data['build-system']
 
 

@@ -9,8 +9,7 @@ from subprocess import check_call
 from sysconfig import get_paths
 from tempfile import mkdtemp
 
-import tomli
-
+from ._compat import tomllib
 from .wrappers import LoggerWrapper, Pep517HookCaller
 
 log = logging.getLogger(__name__)
@@ -21,7 +20,7 @@ def _load_pyproject(source_dir):
             os.path.join(source_dir, 'pyproject.toml'),
             'rb',
             ) as f:
-        pyproject_data = tomli.load(f)
+        pyproject_data = tomllib.load(f)
     buildsys = pyproject_data['build-system']
     return (
         buildsys['requires'],

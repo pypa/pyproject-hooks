@@ -12,8 +12,7 @@ from os.path import join as pjoin
 from subprocess import CalledProcessError
 from tempfile import mkdtemp
 
-import tomli
-
+from ._compat import tomllib
 from .colorlog import enable_colourful_output
 from .envbuild import BuildEnvironment
 from .wrappers import Pep517HookCaller
@@ -144,14 +143,14 @@ def check(source_dir):
 
     try:
         with open(pyproject, 'rb') as f:
-            pyproject_data = tomli.load(f)
+            pyproject_data = tomllib.load(f)
         # Ensure the mandatory data can be loaded
         buildsys = pyproject_data['build-system']
         requires = buildsys['requires']
         backend = buildsys['build-backend']
         backend_path = buildsys.get('backend-path')
         log.info('Loaded pyproject.toml')
-    except (tomli.TOMLDecodeError, KeyError):
+    except (tomllib.TOMLDecodeError, KeyError):
         log.error("Invalid pyproject.toml", exc_info=True)
         return False
 
