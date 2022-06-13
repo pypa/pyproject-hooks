@@ -9,10 +9,18 @@ from os.path import join as pjoin
 
 try:
     import importlib.resources as resources
-
-    def _in_proc_script_path():
-        return resources.path(__package__, '_in_process.py')
+    try:
+        resources.files
+    except AttributeError:
+        # Python 3.8 compatibility
+        def _in_proc_script_path():
+            return resources.path(__package__, '_in_process.py')
+    else:
+        def _in_proc_script_path():
+            return resources.as_file(
+                resources.files(__package__).joinpath('_in_process.py'))
 except ImportError:
+    # Python 3.6 compatibility
     @contextmanager
     def _in_proc_script_path():
         yield pjoin(dirname(abspath(__file__)), '_in_process.py')
