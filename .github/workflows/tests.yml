@@ -2,6 +2,9 @@ name: Tests
 
 on: [push, pull_request]
 
+env:
+  FORCE_COLOR: 1
+
 jobs:
   isort:
     runs-on: ubuntu-latest
