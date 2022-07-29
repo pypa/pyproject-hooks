@@ -1,11 +1,12 @@
 Changelog
 =========
 
-UNRELEASED
-----------
+0.13
+----
 
 - Remove support for end-of-life Pythons. Now requires Python3.6+.
 - Remove support for ``toml`` package. Now requires ``tomli``.
+- Rely on preferred "files" API on Python 3.9 and later (#140).
 
 0.12
 ----
