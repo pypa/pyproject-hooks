@@ -6,7 +6,7 @@ env:
   FORCE_COLOR: 1
 
 jobs:
-  isort:
+  static-checks:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +23,7 @@ jobs:
         pip install tox tox-venv
 
     - name: Run tests
-      run: tox -e isort
+      run: tox -e isort,flake8
 
   tests:
     runs-on: ${{ matrix.os }}

@@ -1,5 +1,4 @@
 pytest
-pytest-flake8
 flake8
 testpath
 tomli
