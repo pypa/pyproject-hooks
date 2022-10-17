@@ -2,9 +2,9 @@ from os.path import abspath, dirname
 from os.path import join as pjoin
 
 import pytest
-import tomli
 from testpath import modified_env
 
+from pep517._compat import tomllib
 from pep517.wrappers import BackendInvalid, Pep517HookCaller
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
@@ -15,7 +15,7 @@ SOURCE_DIR = pjoin(SAMPLES_DIR, 'pkg1')
 def get_hooks(pkg, backend=None, path=None):
     source_dir = pjoin(SAMPLES_DIR, pkg)
     with open(pjoin(source_dir, 'pyproject.toml'), 'rb') as f:
-        data = tomli.load(f)
+        data = tomllib.load(f)
     if backend is None:
         backend = data['build-system']['build-backend']
     if path is None:
