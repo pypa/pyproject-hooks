@@ -23,7 +23,7 @@ Usage—you are responsible for ensuring build requirements are available:
 
     import os
     import tomli
-    from pyproject_hooks.wrappers import Pep517HookCaller
+    from pyproject_hooks.wrappers import BuildBackendHookCaller
 
     src = 'path/to/source'  # Folder containing 'pyproject.toml'
     with open(os.path.join(src, 'pyproject.toml'), 'rb') as f:
@@ -33,7 +33,7 @@ Usage—you are responsible for ensuring build requirements are available:
     # The caller is responsible for installing these and running the hooks in
     # an environment where they are available.
 
-    hooks = Pep517HookCaller(
+    hooks = BuildBackendHookCaller(
         src,
         build_backend=build_sys['build-backend'],
         backend_path=build_sys.get('backend-path'),

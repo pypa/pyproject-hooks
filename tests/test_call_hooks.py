@@ -13,7 +13,7 @@ from testpath.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
 
 from pyproject_hooks.wrappers import (
     BackendUnavailable,
-    Pep517HookCaller,
+    BuildBackendHookCaller,
     UnsupportedOperation,
     default_subprocess_runner,
 )
@@ -26,7 +26,7 @@ def get_hooks(pkg, **kwargs):
     source_dir = pjoin(SAMPLES_DIR, pkg)
     with open(pjoin(source_dir, 'pyproject.toml'), 'rb') as f:
         data = tomli.load(f)
-    return Pep517HookCaller(
+    return BuildBackendHookCaller(
         source_dir, data['build-system']['build-backend'], **kwargs
     )
 

@@ -17,7 +17,7 @@ __all__ = [
     'UnsupportedOperation',
     'default_subprocess_runner',
     'quiet_subprocess_runner',
-    'Pep517HookCaller',
+    'BuildBackendHookCaller',
 ]
 
 
@@ -100,7 +100,7 @@ def norm_and_check(source_tree, requested):
     return abs_requested
 
 
-class Pep517HookCaller:
+class BuildBackendHookCaller:
     """A wrapper around a source directory to be built with a PEP 517 backend.
 
     :param source_dir: The path to the source directory, containing
