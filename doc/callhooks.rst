@@ -1,7 +1,7 @@
 API reference
 =============
 
-.. module:: pep517
+.. module:: pyproject_hooks
 
 Calling the build system
 ------------------------

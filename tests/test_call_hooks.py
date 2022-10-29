@@ -11,7 +11,7 @@ import tomli
 from testpath import assert_isfile, modified_env
 from testpath.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
 
-from pep517.wrappers import (
+from pyproject_hooks.wrappers import (
     BackendUnavailable,
     Pep517HookCaller,
     UnsupportedOperation,

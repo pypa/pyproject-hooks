@@ -5,7 +5,7 @@ import pytest
 import tomli
 from testpath import modified_env
 
-from pep517.wrappers import BackendInvalid, Pep517HookCaller
+from pyproject_hooks.wrappers import BackendInvalid, Pep517HookCaller
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
