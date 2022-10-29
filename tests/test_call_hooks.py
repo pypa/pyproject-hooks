@@ -11,7 +11,7 @@ import tomli
 from testpath import assert_isfile, modified_env
 from testpath.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
 
-from pyproject_hooks.wrappers import (
+from pyproject_hooks import (
     BackendUnavailable,
     BuildBackendHookCaller,
     UnsupportedOperation,
