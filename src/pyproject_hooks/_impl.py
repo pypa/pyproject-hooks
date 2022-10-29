@@ -8,7 +8,7 @@ from os.path import abspath
 from os.path import join as pjoin
 from subprocess import STDOUT, check_call, check_output
 
-from .in_process import _in_proc_script_path
+from ._in_process import _in_proc_script_path
 
 
 def write_json(obj, path, **kwargs):
