@@ -23,9 +23,9 @@ Usage—you are responsible for ensuring build requirements are available:
 
     import os
     try:
-        import tomllib
+        import tomllib  # Python >= 3.11 - standard library
     except ImportError:
-        import tomli as tomllib
+        import tomli as tomllib  # Python <= 3.10
 
     from pyproject_hooks import BuildBackendHookCaller
     import tomli
