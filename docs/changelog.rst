@@ -13,7 +13,8 @@ v1.0
 - Use ``tomllib`` from the standard library on Python 3.11. ``pyproject_hooks``
   now has no external dependencies when installed in Python 3.11.
 - Avoid chaining exceptions when using the fallback implementation for
-  ``prepare_metadata_for_build_wheel``.
+  :meth:`.prepare_metadata_for_build_wheel`.
+- Fix propagating error message for :exc:`.BackendInvalid` errors.
 
 v0.13
 -----
