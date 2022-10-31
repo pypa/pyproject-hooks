@@ -28,7 +28,6 @@ Usage—you are responsible for ensuring build requirements are available:
         import tomli as tomllib  # Python <= 3.10
 
     from pyproject_hooks import BuildBackendHookCaller
-    import tomli
 
     src = 'path/to/source'  # Folder containing 'pyproject.toml'
     with open(os.path.join(src, 'pyproject.toml'), 'rb') as f:
