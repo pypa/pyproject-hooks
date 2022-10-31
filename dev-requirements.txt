@@ -3,5 +3,3 @@ flake8
 testpath
 setuptools>=30
 tomli ; python_version<'3.11'
-importlib_metadata ; python_version<'3.8'
-zipp ; python_version<'3.8'
