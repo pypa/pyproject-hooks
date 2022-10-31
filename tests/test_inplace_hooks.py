@@ -5,7 +5,7 @@ import pytest
 import tomli
 from testpath import modified_env
 
-from pep517.wrappers import BackendInvalid, Pep517HookCaller
+from pyproject_hooks import BackendInvalid, BuildBackendHookCaller
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
@@ -20,7 +20,7 @@ def get_hooks(pkg, backend=None, path=None):
         backend = data['build-system']['build-backend']
     if path is None:
         path = data['build-system']['backend-path']
-    return Pep517HookCaller(source_dir, backend, path)
+    return BuildBackendHookCaller(source_dir, backend, path)
 
 
 @pytest.mark.parametrize('backend_path', [
@@ -28,7 +28,7 @@ def get_hooks(pkg, backend=None, path=None):
     ['../pkg1', 'subdir/..'],
 ])
 def test_backend_path_within_tree(backend_path):
-    Pep517HookCaller(SOURCE_DIR, 'dummy', backend_path)
+    BuildBackendHookCaller(SOURCE_DIR, 'dummy', backend_path)
 
 
 @pytest.mark.parametrize('backend_path', [
@@ -40,7 +40,7 @@ def test_backend_path_within_tree(backend_path):
 def test_backend_out_of_tree(backend_path):
     # TODO: Do we want to insist on ValueError, or invent another exception?
     with pytest.raises(Exception):
-        Pep517HookCaller(SOURCE_DIR, 'dummy', backend_path)
+        BuildBackendHookCaller(SOURCE_DIR, 'dummy', backend_path)
 
 
 def test_intree_backend():
