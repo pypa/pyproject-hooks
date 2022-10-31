@@ -2,10 +2,10 @@ from os.path import abspath, dirname
 from os.path import join as pjoin
 
 import pytest
-import tomli
 from testpath import modified_env
 
 from pyproject_hooks import BackendInvalid, BuildBackendHookCaller
+from pyproject_hooks._compat import tomllib
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
@@ -15,7 +15,7 @@ SOURCE_DIR = pjoin(SAMPLES_DIR, 'pkg1')
 def get_hooks(pkg, backend=None, path=None):
     source_dir = pjoin(SAMPLES_DIR, pkg)
     with open(pjoin(source_dir, 'pyproject.toml'), 'rb') as f:
-        data = tomli.load(f)
+        data = tomllib.load(f)
     if backend is None:
         backend = data['build-system']['build-backend']
     if path is None:

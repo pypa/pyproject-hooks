@@ -22,12 +22,17 @@ Usage—you are responsible for ensuring build requirements are available:
 .. code-block:: python
 
     import os
-    import tomli
+    try:
+        import tomllib  # Python >= 3.11 - standard library
+    except ImportError:
+        import tomli as tomllib  # Python <= 3.10
+
     from pyproject_hooks import BuildBackendHookCaller
+    import tomli
 
     src = 'path/to/source'  # Folder containing 'pyproject.toml'
     with open(os.path.join(src, 'pyproject.toml'), 'rb') as f:
-        build_sys = tomli.load(f)['build-system']
+        build_sys = tomllib.load(f)['build-system']
 
     print(build_sys['requires'])  # List of static requirements
     # The caller is responsible for installing these and running the hooks in
