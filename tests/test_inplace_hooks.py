@@ -4,8 +4,8 @@ from os.path import join as pjoin
 import pytest
 from testpath import modified_env
 
-from pyproject_hooks._compat import tomllib
 from pyproject_hooks import BackendInvalid, BuildBackendHookCaller
+from pyproject_hooks._compat import tomllib
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
