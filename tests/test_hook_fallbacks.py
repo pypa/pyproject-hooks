@@ -5,8 +5,8 @@ import pytest
 from testpath import assert_isfile, modified_env
 from testpath.tempdir import TemporaryDirectory
 
-from pep517._compat import tomllib
-from pep517.wrappers import HookMissing, Pep517HookCaller
+from pyproject_hooks._compat import tomllib
+from pyproject_hooks import BuildBackendHookCaller, HookMissing
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
@@ -16,7 +16,7 @@ def get_hooks(pkg):
     source_dir = pjoin(SAMPLES_DIR, pkg)
     with open(pjoin(source_dir, 'pyproject.toml'), 'rb') as f:
         data = tomllib.load(f)
-    return Pep517HookCaller(source_dir, data['build-system']['build-backend'])
+    return BuildBackendHookCaller(source_dir, data['build-system']['build-backend'])
 
 
 def test_get_requires_for_build_wheel():

@@ -1,12 +1,12 @@
 API reference
 =============
 
-.. module:: pep517
+.. module:: pyproject_hooks
 
 Calling the build system
 ------------------------
 
-.. autoclass:: Pep517HookCaller
+.. autoclass:: BuildBackendHookCaller
 
    .. automethod:: get_requires_for_build_sdist
 
@@ -29,8 +29,8 @@ Calling the build system
 Subprocess runners
 ------------------
 
-These functions may be provided when creating :class:`Pep517HookCaller`,
-or to :meth:`Pep517HookCaller.subprocess_runner`.
+These functions may be provided when creating :class:`BuildBackendHookCaller`,
+or to :meth:`BuildBackendHookCaller.subprocess_runner`.
 
 .. autofunction:: default_subprocess_runner
 

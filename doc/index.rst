@@ -1,5 +1,5 @@
-pep517
-======
+pyproject-hooks
+===============
 
 This package provides an API to call the hooks defined in :pep:`517`.
 

@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'pep517'
+project = 'pyproject-hooks'
 copyright = '2020, Thomas Kluyver'
 author = 'Thomas Kluyver'
 
