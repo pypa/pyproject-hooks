@@ -23,7 +23,7 @@ Usage—you are responsible for ensuring build requirements are available:
 
     import os
     import tomli
-    from pyproject_hooks.wrappers import BuildBackendHookCaller
+    from pyproject_hooks import BuildBackendHookCaller
 
     src = 'path/to/source'  # Folder containing 'pyproject.toml'
     with open(os.path.join(src, 'pyproject.toml'), 'rb') as f:
