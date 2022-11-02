@@ -1,34 +1,34 @@
 Changelog
 =========
 
-0.13
-----
+v0.13
+-----
 
 - Remove support for end-of-life Pythons. Now requires Python3.6+.
 - Remove support for ``toml`` package. Now requires ``tomli``.
 - Rely on preferred "files" API on Python 3.9 and later (#140).
 
-0.12
-----
+v0.12
+-----
 
 - Add method for pip to check if build_editable hook is supported.
   This is a private API for now.
 
-0.11.1
-------
+v0.11.1
+-------
 
 - Fix DeprecationWarning in tomli.
 
-0.11
-----
+v0.11
+-----
 
 - Support editable hooks (`PEP 660 <https://www.python.org/dev/peps/pep-0660/>`_).
 - Use the TOML 1.0 compliant ``tomli`` parser module on Python 3.6 and above.
 - Ensure TOML files are always read as UTF-8.
 - Switch CI to Github actions.
 
-0.10
-----
+v0.10
+-----
 
 - Avoid shadowing imports such as ``colorlog`` in the backend, by moving the
   ``_in_process.py`` script into a separate subpackage.
@@ -39,13 +39,13 @@ Changelog
 - Prefer the standard library ``unittest.mock`` to ``mock`` for tests on Python
   3.6 and above.
 
-0.9.1
------
+v0.9.1
+------
 
 - Silence some static analysis warnings.
 
-0.9
----
+v0.9
+-----
 
 - Deprecated the higher level API which handles creating an environment and
   installing build dependencies. This was not very complete, and the `PyPA build
