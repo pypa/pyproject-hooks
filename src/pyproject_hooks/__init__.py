@@ -1,4 +1,4 @@
-"""Wrappers to build Python packages using PEP 517 hooks
+"""Wrappers to call pyproject.toml-based build backend hooks.
 """
 
 from ._impl import (
