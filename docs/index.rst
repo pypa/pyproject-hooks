@@ -34,3 +34,4 @@ These roles are covered by tools like `build <https://pypa-build.readthedocs.io/
    :hidden:
 
    changelog
+   release-process
