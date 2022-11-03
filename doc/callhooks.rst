@@ -1,6 +1,10 @@
 API reference
 =============
 
+.. warning::
+
+   This package is no longer maintained and is unsupported. Please update your project to use <https://pyproject-hooks.readthedocs.io/> instead.
+
 .. module:: pep517
 
 Calling the build system
