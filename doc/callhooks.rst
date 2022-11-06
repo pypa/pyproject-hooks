@@ -1,6 +1,13 @@
 API reference
 =============
 
+.. warning::
+
+   The core of this package (the APIs described below) has been renamed to
+   `pyproject-hooks <https://pyproject-hooks.readthedocs.io/>`_. Please use that
+   package (low level) or `build <https://pypa-build.readthedocs.io/en/stable/>`_
+   (higher level) in place of ``pep517``.
+
 .. module:: pep517
 
 Calling the build system

@@ -1,6 +1,13 @@
 API to call PEP 517 hooks
 =========================
 
+.. warning::
+
+   The core of this package has been renamed to
+   `pyproject-hooks <https://pyproject-hooks.readthedocs.io/>`_. Please use that
+   package (low level) or `build <https://pypa-build.readthedocs.io/en/stable/>`_
+   (higher level) in place of ``pep517``.
+
 `PEP 517 <https://www.python.org/dev/peps/pep-0517/>`_ specifies a standard
 API for systems which build Python packages.
 
@@ -34,7 +41,7 @@ Usage—you are responsible for ensuring build requirements are available:
     # an environment where they are available.
 
     hooks = Pep517HookCaller(
-        src, 
+        src,
         build_backend=build_sys['build-backend'],
         backend_path=build_sys.get('backend-path'),
     )
