@@ -3,7 +3,10 @@ API to call PEP 517 hooks
 
 .. warning::
 
-   This package is no longer maintained and is unsupported. Please update your project to use <https://pyproject-hooks.readthedocs.io/> instead.
+   The core of this package has been renamed to
+   `pyproject-hooks <https://pyproject-hooks.readthedocs.io/>`_. Please use that
+   package (low level) or `build <https://pypa-build.readthedocs.io/en/stable/>`_
+   (higher level) in place of ``pep517``.
 
 `PEP 517 <https://www.python.org/dev/peps/pep-0517/>`_ specifies a standard
 API for systems which build Python packages.
