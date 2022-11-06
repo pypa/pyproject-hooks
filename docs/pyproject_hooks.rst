@@ -39,7 +39,7 @@ Exceptions
 
 Each exception has public attributes with the same name as their constructors.
 
-.. autoclass:: pyproject_hooks.BackendInvalid
-.. autoclass:: pyproject_hooks.BackendUnavailable
-.. autoclass:: pyproject_hooks.HookMissing
-.. autoclass:: pyproject_hooks.UnsupportedOperation
+.. autoexception:: pyproject_hooks.BackendInvalid
+.. autoexception:: pyproject_hooks.BackendUnavailable
+.. autoexception:: pyproject_hooks.HookMissing
+.. autoexception:: pyproject_hooks.UnsupportedOperation
