@@ -14,6 +14,4 @@ Actual mechanics of making the release:
     bump2version minor
 
 - Push the commit and tags to GitHub.
-- To build and upload the distribution files, run::
-
-    flit publish
+  A GitHub action will upload the release to PyPI.
