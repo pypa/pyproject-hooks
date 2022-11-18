@@ -2,7 +2,7 @@ Changelog
 =========
 
 v1.0
----
+----
 
 - Rename package to ``pyproject_hooks`` (from ``pep517``).
 - Remove deprecated modules (``.build``, ``.check`` and ``.envbuild``).
