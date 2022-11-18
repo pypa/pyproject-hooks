@@ -5,4 +5,6 @@ This is a low-level library for calling build-backends in ``pyproject.toml``-bas
 
 If you want a tool that builds Python packages, you'll want to use https://github.com/pypa/build instead. This is an underlying piece for `pip`, `build` and other "build frontends" use to call "build backends" within them.
 
-You can read more in the `documentation <https://pyproject-hooks.readthedocs.io/>`.
+You can read more in the `documentation <https://pyproject-hooks.readthedocs.io/>`_.
+
+  Note: The ``pep517`` project has been replaced by this project (low level) and the ``build`` project (high level).
