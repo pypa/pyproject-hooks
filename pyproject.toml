@@ -21,6 +21,8 @@ dynamic = ["version", "description"]
 
 [project.urls]
 Source = "https://github.com/pypa/pyproject-hooks"
+Documentation = "https://pyproject-hooks.readthedocs.io/"
+Changelog = "https://pyproject-hooks.readthedocs.io/en/latest/changelog.html"
 
 [tool.isort]
 profile = "black"
