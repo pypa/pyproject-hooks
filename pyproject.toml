@@ -2,24 +2,27 @@
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
-[tool.flit.metadata]
-module = "pyproject_hooks"
-dist-name = "pyproject-hooks"
-author = "Thomas Kluyver"
-author-email = "thomas@kluyver.me.uk"
-home-page = "https://github.com/pypa/pyproject-hooks"
-description-file = "README.rst"
-requires = [
-    "tomli >=1.1.0;python_version<'3.11'",
-    "importlib_metadata;python_version<'3.8'",
-    "zipp;python_version<'3.8'",
+[project]
+name = "pyproject_hooks"
+authors = [
+    {name = "Thomas Kluyver", email = "thomas@kluyver.me.uk"},
 ]
+readme = "README.rst"
 requires-python = ">=3.7"
+dependencies = [
+    "tomli >=1.1.0 ; python_version<'3.11'",
+]
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
 ]
+dynamic = ["version", "description"]
+
+[project.urls]
+Source = "https://github.com/pypa/pyproject-hooks"
+Documentation = "https://pyproject-hooks.readthedocs.io/"
+Changelog = "https://pyproject-hooks.readthedocs.io/en/latest/changelog.html"
 
 [tool.isort]
 profile = "black"

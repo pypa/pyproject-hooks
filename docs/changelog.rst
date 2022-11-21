@@ -1,6 +1,21 @@
 Changelog
 =========
 
+v1.0
+----
+
+- Rename package to ``pyproject_hooks`` (from ``pep517``).
+- Remove deprecated modules (``.build``, ``.check`` and ``.envbuild``).
+  Use the `build <https://pypa-build.readthedocs.io/en/stable/>`_ project
+  instead for this higher-level functionality of setting up a temporary build
+  environment.
+- Require Python 3.7 or above.
+- Use ``tomllib`` from the standard library on Python 3.11. ``pyproject_hooks``
+  now has no external dependencies when installed in Python 3.11.
+- Avoid chaining exceptions when using the fallback implementation for
+  :meth:`.prepare_metadata_for_build_wheel`.
+- Fix propagating error message for :exc:`.BackendInvalid` errors.
+
 v0.13
 -----
 
