@@ -6,7 +6,7 @@ from testpath import assert_isfile, modified_env
 from testpath.tempdir import TemporaryDirectory
 
 from pyproject_hooks import BuildBackendHookCaller, HookMissing
-from pyproject_hooks._compat import tomllib
+from tests.compat import tomllib
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), 'samples')
 BUILDSYS_PKGS = pjoin(SAMPLES_DIR, 'buildsys_pkgs')
