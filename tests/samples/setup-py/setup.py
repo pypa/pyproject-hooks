@@ -1,6 +1,6 @@
 from setuptools import setup
 
 setup(
-    name='pep517-test-setup-py-support',
-    version='1.0'
+    name="pep517-test-setup-py-support",
+    version="1.0",
 )
