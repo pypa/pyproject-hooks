@@ -16,7 +16,9 @@ def get_hooks(pkg):
     source_dir = pjoin(SAMPLES_DIR, pkg)
     with open(pjoin(source_dir, 'pyproject.toml'), 'rb') as f:
         data = tomllib.load(f)
-    return BuildBackendHookCaller(source_dir, data['build-system']['build-backend'])
+    return BuildBackendHookCaller(
+        source_dir, data['build-system']['build-backend']
+    )
 
 
 def test_get_requires_for_build_wheel():
