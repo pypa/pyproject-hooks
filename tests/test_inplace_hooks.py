@@ -62,7 +62,7 @@ def test_intree_backend():
 def test_intree_backend_not_in_path():
     hooks = get_hooks("pkg_intree", backend="buildsys")
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
-        msg = "Cannot find module 'buildsys' in .*/pkg_intree/backend"
+        msg = "Cannot find module 'buildsys' in .*pkg_intree.*backend"
         with pytest.raises(BackendUnavailable, match=msg):
             hooks.get_requires_for_build_sdist({})
 
