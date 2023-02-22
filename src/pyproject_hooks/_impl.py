@@ -23,8 +23,12 @@ def read_json(path):
 class BackendUnavailable(Exception):
     """Will be raised if the backend cannot be imported in the hook process."""
 
-    def __init__(self, traceback):
+    def __init__(self, traceback, message=None, backend_name=None, backend_path=None):
+        # Keep API backward compatibility
+        self.backend_name = backend_name
+        self.backend_path = backend_path
         self.traceback = traceback
+        super().__init__(message or "Error while importing backend")
 
 
 class BackendInvalid(Exception):
@@ -334,12 +338,11 @@ class BuildBackendHookCaller:
             if data.get("unsupported"):
                 raise UnsupportedOperation(data.get("traceback", ""))
             if data.get("no_backend"):
-                raise BackendUnavailable(data.get("traceback", ""))
-            if data.get("backend_invalid"):
-                raise BackendInvalid(
+                raise BackendUnavailable(
+                    data.get("traceback", ""),
+                    message=data.get("backend_error", ""),
                     backend_name=self.build_backend,
                     backend_path=self.backend_path,
-                    message=data.get("backend_error", ""),
                 )
             if data.get("hook_missing"):
                 raise HookMissing(data.get("missing_hook_name") or hook_name)

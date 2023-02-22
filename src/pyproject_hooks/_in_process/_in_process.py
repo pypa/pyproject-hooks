@@ -42,15 +42,10 @@ def read_json(path):
 class BackendUnavailable(Exception):
     """Raised if we cannot import the backend"""
 
-    def __init__(self, traceback):
-        self.traceback = traceback
-
-
-class BackendInvalid(Exception):
-    """Raised if the backend is invalid"""
-
-    def __init__(self, message):
+    def __init__(self, message, traceback=None):
+        super().__init__(message)
         self.message = message
+        self.traceback = traceback
 
 
 class HookMissing(Exception):
@@ -75,7 +70,8 @@ def _build_backend():
         try:
             obj = import_module(mod_path)
         except ImportError:
-            raise BackendUnavailable(traceback.format_exc())
+            msg = "Cannot import {mod_path!r}"
+            raise BackendUnavailable(msg, traceback.format_exc())
 
     if obj_path:
         for path_part in obj_path.split("."):
@@ -356,8 +352,6 @@ def main():
     except BackendUnavailable as e:
         json_out["no_backend"] = True
         json_out["traceback"] = e.traceback
-    except BackendInvalid as e:
-        json_out["backend_invalid"] = True
         json_out["backend_error"] = e.message
     except GotUnsupportedOperation as e:
         json_out["unsupported"] = True
