@@ -70,7 +70,7 @@ def _build_backend():
         try:
             obj = import_module(mod_path)
         except ImportError:
-            msg = "Cannot import {mod_path!r}"
+            msg = f"Cannot import {mod_path!r}"
             raise BackendUnavailable(msg, traceback.format_exc())
 
     if obj_path:
