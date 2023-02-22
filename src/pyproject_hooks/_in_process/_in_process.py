@@ -21,6 +21,8 @@ import sys
 import traceback
 from glob import glob
 from importlib import import_module
+from importlib.util import module_from_spec
+from importlib.machinery import PathFinder
 from os.path import join as pjoin
 
 # This file is run as a script, and `import wrappers` is not zip-safe, so we
@@ -59,36 +61,48 @@ class HookMissing(Exception):
         self.hook_name = hook_name
 
 
-def contained_in(filename, directory):
-    """Test if a file is located within the given directory."""
-    filename = os.path.normcase(os.path.abspath(filename))
-    directory = os.path.normcase(os.path.abspath(directory))
-    return os.path.commonprefix([filename, directory]) == directory
-
-
 def _build_backend():
     """Find and load the build backend"""
     # Add in-tree backend directories to the front of sys.path.
     backend_path = os.environ.get("_PYPROJECT_HOOKS_BACKEND_PATH")
-    if backend_path:
-        extra_pathitems = backend_path.split(os.pathsep)
-        sys.path[:0] = extra_pathitems
-
     ep = os.environ["_PYPROJECT_HOOKS_BUILD_BACKEND"]
     mod_path, _, obj_path = ep.partition(":")
-    try:
-        obj = import_module(mod_path)
-    except ImportError:
-        raise BackendUnavailable(traceback.format_exc())
 
     if backend_path:
-        if not any(contained_in(obj.__file__, path) for path in extra_pathitems):
-            raise BackendInvalid("Backend was not loaded from backend-path")
+        extra_pathitems = backend_path.split(os.pathsep)
+        obj = _load_module_from_path(mod_path, extra_pathitems)
+    else:
+        try:
+            obj = import_module(mod_path)
+        except ImportError:
+            raise BackendUnavailable(traceback.format_exc())
 
     if obj_path:
         for path_part in obj_path.split("."):
             obj = getattr(obj, path_part)
     return obj
+
+
+def _load_module_from_path(fullname, pathitems):
+    """Given a set of sys.path-like entries, load a module from it"""
+    sys.path[:0] = pathitems  # Still required for other imports.
+    parts = fullname.split(".")
+    # Parent packages need to be imported to ensure everything comes from pathitems.
+    for i in range(len(parts)):
+        module_name = ".".join(parts[: i + 1])
+        spec = _find_spec_in_path(module_name, pathitems)
+        module = module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+    return module
+
+
+def _find_spec_in_path(fullname, pathitems):
+    """Given sys.path-like entries, find a module spec or raise an exception"""
+    spec = PathFinder.find_spec(fullname, path=pathitems)
+    if not spec:
+        raise BackendUnavailable(f"Cannot find module {fullname!r} in {pathitems!r}")
+    return spec
 
 
 def _supported_features():

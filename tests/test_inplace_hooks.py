@@ -7,7 +7,7 @@ import pytest
 from testpath import modified_env
 from testpath.tempdir import TemporaryDirectory
 
-from pyproject_hooks import BackendInvalid, BuildBackendHookCaller
+from pyproject_hooks import BackendUnavailable, BuildBackendHookCaller
 from tests.compat import tomllib
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), "samples")
@@ -62,7 +62,8 @@ def test_intree_backend():
 def test_intree_backend_not_in_path():
     hooks = get_hooks("pkg_intree", backend="buildsys")
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
-        with pytest.raises(BackendInvalid):
+        msg = "Cannot find module 'buildsys' in .*/pkg_intree/backend"
+        with pytest.raises(BackendUnavailable, match=msg):
             hooks.get_requires_for_build_sdist({})
 
 
