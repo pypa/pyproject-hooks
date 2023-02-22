@@ -24,7 +24,7 @@ class BackendUnavailable(Exception):
     """Will be raised if the backend cannot be imported in the hook process."""
 
     def __init__(self, traceback, message=None, backend_name=None, backend_path=None):
-        # Keep API backward compatibility
+        # Preserving arg order for the sake of API backward compatibility.
         self.backend_name = backend_name
         self.backend_path = backend_path
         self.traceback = traceback
