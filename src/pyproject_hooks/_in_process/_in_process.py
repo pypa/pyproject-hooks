@@ -57,12 +57,12 @@ class HookMissing(Exception):
 
 def _build_backend():
     """Find and load the build backend"""
-    # Add in-tree backend directories to the front of sys.path.
     backend_path = os.environ.get("_PYPROJECT_HOOKS_BACKEND_PATH")
     ep = os.environ["_PYPROJECT_HOOKS_BUILD_BACKEND"]
     mod_path, _, obj_path = ep.partition(":")
 
     if backend_path:
+        # Ensure in-tree backend directories have the highest priority when importing.
         extra_pathitems = backend_path.split(os.pathsep)
         sys.meta_path.insert(0, _BackendPathFinder(extra_pathitems, mod_path))
 
