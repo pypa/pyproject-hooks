@@ -21,7 +21,6 @@ import sys
 import traceback
 from glob import glob
 from importlib import import_module
-from importlib.util import module_from_spec
 from importlib.machinery import PathFinder
 from os.path import join as pjoin
 
@@ -65,13 +64,13 @@ def _build_backend():
 
     if backend_path:
         extra_pathitems = backend_path.split(os.pathsep)
-        obj = _load_module_from_path(mod_path, extra_pathitems)
-    else:
-        try:
-            obj = import_module(mod_path)
-        except ImportError:
-            msg = f"Cannot import {mod_path!r}"
-            raise BackendUnavailable(msg, traceback.format_exc())
+        sys.meta_path.insert(0, _BackendPathFinder(extra_pathitems, mod_path))
+
+    try:
+        obj = import_module(mod_path)
+    except ImportError:
+        msg = f"Cannot import {mod_path!r}"
+        raise BackendUnavailable(msg, traceback.format_exc())
 
     if obj_path:
         for path_part in obj_path.split("."):
@@ -79,26 +78,27 @@ def _build_backend():
     return obj
 
 
-def _load_module_from_path(fullname, pathitems):
-    """Given a set of sys.path-like entries, load a module from it"""
-    sys.path[:0] = pathitems  # Still required for other imports.
-    parts = fullname.split(".")
-    # Parent packages need to be imported to ensure everything comes from pathitems.
-    for i in range(len(parts)):
-        module_name = ".".join(parts[: i + 1])
-        spec = _find_spec_in_path(module_name, pathitems)
-        module = module_from_spec(spec)
-        sys.modules[module_name] = module
-        spec.loader.exec_module(module)
-    return module
+class _BackendPathFinder:
+    """Implements the MetaPathFinder interface to locate modules in ``backend-path``.
 
+    Since the environment provided by the frontend can contain all sorts of
+    MetaPathFinders, the only way to ensure the backend is loaded from the
+    right place is to prepend our own.
+    """
 
-def _find_spec_in_path(fullname, pathitems):
-    """Given sys.path-like entries, find a module spec or raise an exception"""
-    spec = PathFinder.find_spec(fullname, path=pathitems)
-    if not spec:
-        raise BackendUnavailable(f"Cannot find module {fullname!r} in {pathitems!r}")
-    return spec
+    def __init__(self, backend_path, backend_module):
+        self.backend_path = backend_path
+        self.backend_module = backend_module
+
+    def find_spec(self, fullname, _path, _target=None):
+        # Ignore other items in _path or sys.path and use backend_path instead:
+        spec = PathFinder.find_spec(fullname, path=self.backend_path)
+        if spec is None and fullname == self.backend_module:
+            # According to the spec, the backend MUST be loaded from backend-path.
+            # Therefore, we can halt the import machinery and raise a clean error.
+            msg = f"Cannot find module {self.backend_module!r} in {self.backend_path!r}"
+            raise BackendUnavailable(msg)
+        return spec
 
 
 def _supported_features():
