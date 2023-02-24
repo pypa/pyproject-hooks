@@ -71,9 +71,10 @@ def test_intree_backend_loaded_from_correct_backend_path():
     """
     PEP 517 establishes that the backend code should be loaded from ``backend-path``,
     and recognizes that not always the environment isolation is perfect
-    (e.g. it explicitly mentions ``--system-site-packages``). Therefore, even in a
-    situation where a ``MetaPathFinder`` would have priority to find the backend spec,
-    the backend should still be loaded from ``backend-path``.
+    (e.g. it explicitly mentions ``--system-site-packages``).
+    Therefore, even in a situation where a third-party ``MetaPathFinder`` has
+    precedence over ``importlib.machinery.PathFinder``, the backend should
+    still be loaded from ``backend-path``.
     """
     hooks = get_hooks("pkg_intree", backend="intree_backend")
     with TemporaryDirectory() as tmp:
