@@ -184,7 +184,7 @@ def prepare_metadata_for_build_editable(
         return hook(metadata_directory, config_settings)
 
 
-WHEEL_BUILT_MARKER = "PEP517_ALREADY_BUILT_WHEEL"
+WHEEL_BUILT_MARKER = "PYPROJECT_HOOKS_ALREADY_BUILT_WHEEL"
 
 
 def _dist_info_files(whl_zip):
