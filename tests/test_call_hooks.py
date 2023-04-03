@@ -183,13 +183,13 @@ def test_custom_python_executable(monkeypatch, tmpdir):
         assert runner.call_args[0][0][0] == "some-python"
 
 
-def test_issue_104():
-    hooks = get_hooks("test-for-issue-104")
+def test_path_pollution():
+    hooks = get_hooks("path-pollution")
     with TemporaryDirectory() as outdir:
         with modified_env(
             {
                 "PYTHONPATH": BUILDSYS_PKGS,
-                "PEP517_ISSUE104_OUTDIR": outdir,
+                "TEST_POLLUTION_OUTDIR": outdir,
             }
         ):
             hooks.get_requires_for_build_wheel({})
