@@ -4,7 +4,7 @@ Changelog
 v1.1
 ----
 
-No changes.
+- Drop support for Python 3.7.
 
 v1.0
 ----
