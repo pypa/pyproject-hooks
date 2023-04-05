@@ -22,5 +22,8 @@ Source = "https://github.com/pypa/pyproject-hooks"
 Documentation = "https://pyproject-hooks.readthedocs.io/"
 Changelog = "https://pyproject-hooks.readthedocs.io/en/latest/changelog.html"
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+src = ["src", "tests"]
+
+[tool.ruff.isort]
+known-first-party = ["pyproject_hooks", "tests"]
