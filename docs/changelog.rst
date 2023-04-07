@@ -4,6 +4,7 @@ Changelog
 v1.1
 ----
 
+- Add type annotations to the public API.
 - Drop support for Python 3.7.
 
 v1.0
