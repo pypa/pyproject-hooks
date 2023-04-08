@@ -1,6 +1,8 @@
 """Wrappers to call pyproject.toml-based build backend hooks.
 """
 
+from typing import TYPE_CHECKING
+
 from ._impl import (
     BackendInvalid,
     BackendUnavailable,
@@ -21,3 +23,8 @@ __all__ = [
     "quiet_subprocess_runner",
     "BuildBackendHookCaller",
 ]
+
+if TYPE_CHECKING:
+    from ._impl import SubprocessRunner  # noqa: F401
+
+    __all__.append("SubprocessRunner")
