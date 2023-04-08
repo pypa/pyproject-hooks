@@ -6,9 +6,23 @@ from contextlib import contextmanager
 from os.path import abspath
 from os.path import join as pjoin
 from subprocess import STDOUT, check_call, check_output
-from typing import Any, Dict, Iterator, List, Optional, Protocol
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional
 
 from ._in_process import _in_proc_script_path
+
+if TYPE_CHECKING:
+    from typing import Protocol
+
+    class SubprocessRunner(Protocol):
+        """A protocol for the subprocess runner."""
+
+        def __call__(
+            self,
+            cmd: List[str],
+            cwd: Optional[str] = None,
+            extra_environ: Optional[Dict[str, str]] = None,
+        ) -> None:
+            ...
 
 
 def write_json(obj: Dict[str, Any], path: str, **kwargs) -> None:
@@ -55,18 +69,6 @@ class UnsupportedOperation(Exception):
 
     def __init__(self, traceback: str) -> None:
         self.traceback = traceback
-
-
-class SubprocessRunner(Protocol):
-    """A protocol for the subprocess runner."""
-
-    def __call__(
-        self,
-        cmd: List[str],
-        cwd: Optional[str] = None,
-        extra_environ: Optional[Dict[str, str]] = None,
-    ) -> None:
-        ...
 
 
 def default_subprocess_runner(
