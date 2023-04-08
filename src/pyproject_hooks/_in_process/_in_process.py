@@ -3,8 +3,8 @@
 It expects:
 - Command line args: hook_name, control_dir
 - Environment variables:
-      PEP517_BUILD_BACKEND=entry.point:spec
-      PEP517_BACKEND_PATH=paths (separated with os.pathsep)
+      _PYPROJECT_HOOKS_BUILD_BACKEND=entry.point:spec
+      _PYPROJECT_HOOKS_BACKEND_PATH=paths (separated with os.pathsep)
 - control_dir/input.json:
   - {"kwargs": {...}}
 
@@ -69,12 +69,12 @@ def contained_in(filename, directory):
 def _build_backend():
     """Find and load the build backend"""
     # Add in-tree backend directories to the front of sys.path.
-    backend_path = os.environ.get("PEP517_BACKEND_PATH")
+    backend_path = os.environ.get("_PYPROJECT_HOOKS_BACKEND_PATH")
     if backend_path:
         extra_pathitems = backend_path.split(os.pathsep)
         sys.path[:0] = extra_pathitems
 
-    ep = os.environ["PEP517_BUILD_BACKEND"]
+    ep = os.environ["_PYPROJECT_HOOKS_BUILD_BACKEND"]
     mod_path, _, obj_path = ep.partition(":")
     try:
         obj = import_module(mod_path)
@@ -184,7 +184,7 @@ def prepare_metadata_for_build_editable(
         return hook(metadata_directory, config_settings)
 
 
-WHEEL_BUILT_MARKER = "PEP517_ALREADY_BUILT_WHEEL"
+WHEEL_BUILT_MARKER = "PYPROJECT_HOOKS_ALREADY_BUILT_WHEEL"
 
 
 def _dist_info_files(whl_zip):
