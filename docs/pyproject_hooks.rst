@@ -22,15 +22,15 @@ Custom Subprocess Runners
 
 It is possible to provide a custom subprocess runner, that behaves differently. The expected protocol for subprocess runners is as follows:
 
-.. function:: subprocess_runner_protocol(cmd, cwd, extra_environ)
+.. function:: subprocess_runner_protocol(cmd, cwd=None, extra_environ=None)
    :noindex:
 
    :param cmd: The command and arguments to execute, as would be passed to :func:`subprocess.run`.
-   :type cmd: list[str]
+   :type cmd: typing.Sequence[str]
    :param cwd: The working directory that must be used for the subprocess.
-   :type cwd: str
+   :type cwd: typing.Optional[str]
    :param extra_environ: Mapping of environment variables (name to value) which must be set for the subprocess execution.
-   :type extra_environ: dict[str, str]
+   :type extra_environ: typing.Optional[typing.Mapping[str, str]]
 
    :rtype: None
 

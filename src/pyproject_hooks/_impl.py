@@ -164,6 +164,8 @@ class BuildBackendHookCaller:
         """A context manager for temporarily overriding the default
         :ref:`subprocess runner <Subprocess Runners>`.
 
+        :param runner: The new subprocess runner to use within the context.
+
         .. code-block:: python
 
             hook_caller = BuildBackendHookCaller(...)
@@ -187,6 +189,7 @@ class BuildBackendHookCaller:
     ) -> Sequence[str]:
         """Get additional dependencies required for building a wheel.
 
+        :param config_settings: The configuration settings for the build backend
         :returns: A list of :pep:`dependency specifiers <508>`.
 
         .. admonition:: Fallback
@@ -205,6 +208,12 @@ class BuildBackendHookCaller:
         _allow_fallback: bool = True,
     ) -> str:
         """Prepare a ``*.dist-info`` folder with metadata for this project.
+
+        :param metadata_directory: The directory to write the metadata to
+        :param config_settings: The configuration settings for the build backend
+        :param _allow_fallback:
+            Whether to allow the fallback to building a wheel and extracting
+            the metadata from it. Should be passed as a keyword argument only.
 
         :returns: Name of the newly created subfolder within
                   ``metadata_directory``, containing the metadata.
@@ -233,6 +242,9 @@ class BuildBackendHookCaller:
     ) -> str:
         """Build a wheel from this project.
 
+        :param wheel_directory: The directory to write the wheel to
+        :param config_settings: The configuration settings for the build backend
+        :param metadata_directory: The directory to reuse existing metadata from
         :returns:
             The name of the newly created wheel within ``wheel_directory``.
 
@@ -260,6 +272,7 @@ class BuildBackendHookCaller:
     ) -> Sequence[str]:
         """Get additional dependencies required for building an editable wheel.
 
+        :param config_settings: The configuration settings for the build backend
         :returns: A list of :pep:`dependency specifiers <508>`.
 
         .. admonition:: Fallback
@@ -279,6 +292,11 @@ class BuildBackendHookCaller:
     ) -> Optional[str]:
         """Prepare a ``*.dist-info`` folder with metadata for this project.
 
+        :param metadata_directory: The directory to write the metadata to
+        :param config_settings: The configuration settings for the build backend
+        :param _allow_fallback:
+            Whether to allow the fallback to building a wheel and extracting
+            the metadata from it. Should be passed as a keyword argument only.
         :returns: Name of the newly created subfolder within
                   ``metadata_directory``, containing the metadata.
 
@@ -306,6 +324,9 @@ class BuildBackendHookCaller:
     ) -> str:
         """Build an editable wheel from this project.
 
+        :param wheel_directory: The directory to write the wheel to
+        :param config_settings: The configuration settings for the build backend
+        :param metadata_directory: The directory to reuse existing metadata from
         :returns:
             The name of the newly created wheel within ``wheel_directory``.
 
