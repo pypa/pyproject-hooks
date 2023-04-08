@@ -208,7 +208,6 @@ class BuildBackendHookCaller:
 
         :returns: Name of the newly created subfolder within
                   ``metadata_directory``, containing the metadata.
-        :rtype: str
 
         .. admonition:: Fallback
 
@@ -282,7 +281,6 @@ class BuildBackendHookCaller:
 
         :returns: Name of the newly created subfolder within
                   ``metadata_directory``, containing the metadata.
-        :rtype: str
 
         .. admonition:: Fallback
 
