@@ -40,7 +40,7 @@ def lint(session: nox.Session) -> None:
     session.run("pre-commit", "run", *args)
 
 
-@nox.session(name="docs-live")
+@nox.session
 def release(session: nox.Session) -> None:
     session.install("flit")
     session.run("flit", "publish")
