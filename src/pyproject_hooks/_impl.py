@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from os.path import abspath
 from os.path import join as pjoin
 from subprocess import STDOUT, check_call, check_output
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional
+from typing import TYPE_CHECKING, Any, Iterator, Mapping, Optional, Sequence
 
 from ._in_process import _in_proc_script_path
 
@@ -18,19 +18,19 @@ if TYPE_CHECKING:
 
         def __call__(
             self,
-            cmd: List[str],
+            cmd: Sequence[str],
             cwd: Optional[str] = None,
-            extra_environ: Optional[Dict[str, str]] = None,
+            extra_environ: Optional[Mapping[str, str]] = None,
         ) -> None:
             ...
 
 
-def write_json(obj: Dict[str, Any], path: str, **kwargs) -> None:
+def write_json(obj: Mapping[str, Any], path: str, **kwargs) -> None:
     with open(path, "w", encoding="utf-8") as f:
         json.dump(obj, f, **kwargs)
 
 
-def read_json(path: str) -> Dict[str, Any]:
+def read_json(path: str) -> Mapping[str, Any]:
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
@@ -48,7 +48,7 @@ class BackendInvalid(Exception):
     def __init__(
         self,
         backend_name: str,
-        backend_path: Optional[List[str]],
+        backend_path: Optional[Sequence[str]],
         message: str,
     ) -> None:
         super().__init__(message)
@@ -72,9 +72,9 @@ class UnsupportedOperation(Exception):
 
 
 def default_subprocess_runner(
-    cmd: List[str],
+    cmd: Sequence[str],
     cwd: Optional[str] = None,
-    extra_environ: Optional[Dict[str, str]] = None,
+    extra_environ: Optional[Mapping[str, str]] = None,
 ) -> None:
     """The default method of calling the wrapper subprocess.
 
@@ -88,9 +88,9 @@ def default_subprocess_runner(
 
 
 def quiet_subprocess_runner(
-    cmd: List[str],
+    cmd: Sequence[str],
     cwd: Optional[str] = None,
-    extra_environ: Optional[Dict[str, str]] = None,
+    extra_environ: Optional[Mapping[str, str]] = None,
 ) -> None:
     """Call the subprocess while suppressing output.
 
@@ -134,7 +134,7 @@ class BuildBackendHookCaller:
         self,
         source_dir: str,
         build_backend: str,
-        backend_path: Optional[List[str]] = None,
+        backend_path: Optional[Sequence[str]] = None,
         runner: Optional["SubprocessRunner"] = None,
         python_executable: Optional[str] = None,
     ) -> None:
@@ -177,18 +177,17 @@ class BuildBackendHookCaller:
         finally:
             self._subprocess_runner = prev
 
-    def _supported_features(self) -> List[str]:
+    def _supported_features(self) -> Sequence[str]:
         """Return the list of optional features supported by the backend."""
         return self._call_hook("_supported_features", {})
 
     def get_requires_for_build_wheel(
         self,
-        config_settings: Optional[Dict[str, Any]] = None,
-    ) -> List[str]:
+        config_settings: Optional[Mapping[str, Any]] = None,
+    ) -> Sequence[str]:
         """Get additional dependencies required for building a wheel.
 
         :returns: A list of :pep:`dependency specifiers <508>`.
-        :rtype: list[str]
 
         .. admonition:: Fallback
 
@@ -202,7 +201,7 @@ class BuildBackendHookCaller:
     def prepare_metadata_for_build_wheel(
         self,
         metadata_directory: str,
-        config_settings: Optional[Dict[str, Any]] = None,
+        config_settings: Optional[Mapping[str, Any]] = None,
         _allow_fallback: bool = True,
     ) -> Optional[str]:
         """Prepare a ``*.dist-info`` folder with metadata for this project.
@@ -230,7 +229,7 @@ class BuildBackendHookCaller:
     def build_wheel(
         self,
         wheel_directory: str,
-        config_settings: Optional[Dict[str, Any]] = None,
+        config_settings: Optional[Mapping[str, Any]] = None,
         metadata_directory: Optional[str] = None,
     ) -> str:
         """Build a wheel from this project.
@@ -258,12 +257,11 @@ class BuildBackendHookCaller:
 
     def get_requires_for_build_editable(
         self,
-        config_settings: Optional[Dict[str, Any]] = None,
-    ) -> List[str]:
+        config_settings: Optional[Mapping[str, Any]] = None,
+    ) -> Sequence[str]:
         """Get additional dependencies required for building an editable wheel.
 
         :returns: A list of :pep:`dependency specifiers <508>`.
-        :rtype: list[str]
 
         .. admonition:: Fallback
 
@@ -277,7 +275,7 @@ class BuildBackendHookCaller:
     def prepare_metadata_for_build_editable(
         self,
         metadata_directory: str,
-        config_settings: Optional[Dict[str, Any]] = None,
+        config_settings: Optional[Mapping[str, Any]] = None,
         _allow_fallback: bool = True,
     ) -> Optional[str]:
         """Prepare a ``*.dist-info`` folder with metadata for this project.
@@ -305,7 +303,7 @@ class BuildBackendHookCaller:
     def build_editable(
         self,
         wheel_directory: str,
-        config_settings: Optional[Dict[str, Any]] = None,
+        config_settings: Optional[Mapping[str, Any]] = None,
         metadata_directory: Optional[str] = None,
     ) -> str:
         """Build an editable wheel from this project.
@@ -334,12 +332,11 @@ class BuildBackendHookCaller:
 
     def get_requires_for_build_sdist(
         self,
-        config_settings: Optional[Dict[str, Any]] = None,
-    ) -> List[str]:
+        config_settings: Optional[Mapping[str, Any]] = None,
+    ) -> Sequence[str]:
         """Get additional dependencies required for building an sdist.
 
         :returns: A list of :pep:`dependency specifiers <508>`.
-        :rtype: list[str]
         """
         return self._call_hook(
             "get_requires_for_build_sdist", {"config_settings": config_settings}
@@ -348,7 +345,7 @@ class BuildBackendHookCaller:
     def build_sdist(
         self,
         sdist_directory: str,
-        config_settings: Optional[Dict[str, Any]] = None,
+        config_settings: Optional[Mapping[str, Any]] = None,
     ) -> str:
         """Build an sdist from this project.
 
@@ -363,7 +360,7 @@ class BuildBackendHookCaller:
             },
         )
 
-    def _call_hook(self, hook_name: str, kwargs: Dict[str, Any]) -> Any:
+    def _call_hook(self, hook_name: str, kwargs: Mapping[str, Any]) -> Any:
         extra_environ = {"PEP517_BUILD_BACKEND": self.build_backend}
 
         if self.backend_path:
