@@ -34,6 +34,19 @@ It is possible to provide a custom subprocess runner, that behaves differently. 
 
    :rtype: None
 
+Since this codebase is currently Python 3.7-compatible, the type annotation for this protocol is only available to type checkers. To annotate a variable as a subprocess runner, you can do something along the lines of:
+
+.. code-block:: python
+
+   from typing import TYPE_CHECKING
+
+   if TYPE_CHECKING:
+      from pyproject_hooks import SubprocessRunner
+
+   # Example usage
+   def build(awesome_runner: "SubprocessRunner") -> None:
+      ...
+
 Exceptions
 ----------
 
