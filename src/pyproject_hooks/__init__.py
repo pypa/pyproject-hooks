@@ -2,6 +2,7 @@
 """
 
 from ._impl import (
+    BuildBackendWarning,
     BackendInvalid,
     BackendUnavailable,
     BuildBackendHookCaller,
@@ -13,6 +14,7 @@ from ._impl import (
 
 __version__ = "1.0.0"
 __all__ = [
+    "BuildBackendWarning",
     "BackendUnavailable",
     "BackendInvalid",
     "HookMissing",
