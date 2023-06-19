@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from os.path import abspath
 from os.path import join as pjoin
 from subprocess import STDOUT, check_call, check_output
+import warnings
 
 from ._in_process import _in_proc_script_path
 
@@ -18,6 +19,10 @@ def write_json(obj, path, **kwargs):
 def read_json(path):
     with open(path, encoding="utf-8") as f:
         return json.load(f)
+
+
+class BuildBackendWarning(UserWarning):
+    """Will be emitted for every UserWarning emitted by the hook process."""
 
 
 class BackendUnavailable(Exception):
@@ -343,4 +348,12 @@ class BuildBackendHookCaller:
                 )
             if data.get("hook_missing"):
                 raise HookMissing(data.get("missing_hook_name") or hook_name)
+
+            for w in data.get("warnings", []):
+                warnings.warn_explicit(
+                    message=w["message"],
+                    category=BuildBackendWarning,
+                    filename=w["filename"],
+                    lineno=w["lineno"],
+                )
             return data["return_val"]
