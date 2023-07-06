@@ -351,6 +351,11 @@ def main():
     except HookMissing as e:
         json_out["hook_missing"] = True
         json_out["missing_hook_name"] = e.hook_name or hook_name
+    except SystemExit as e:
+        # Treat hooks calling sys.exit(0), e.g. in setup.py, as equivalent to
+        # returning normally without an error.
+        if e.code not in (0, None):
+            raise
 
     write_json(json_out, pjoin(control_dir, "output.json"), indent=2)
 
