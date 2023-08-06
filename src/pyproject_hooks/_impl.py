@@ -32,7 +32,14 @@ class BackendUnavailable(Exception):
 
 
 class BackendInvalid(Exception):
-    """Will be raised if the backend is invalid."""
+    """Will be raised if the backend is invalid.
+
+    .. deprecated:: 1.1.0
+        ``pyproject_hooks`` no longer produces ``BackendInvalid`` exceptions.
+        Consider using ``BackendUnavailable`` to handle situations that
+        previously would raise ``BackendInvalid``.
+        Future versions of the library may remove this class.
+    """
 
     def __init__(self, backend_name, backend_path, message):
         super().__init__(message)
