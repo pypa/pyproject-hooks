@@ -52,8 +52,9 @@ def test_backend_out_of_tree(backend_path):
         BuildBackendHookCaller(SOURCE_DIR, "dummy", backend_path)
 
 
-def test_intree_backend():
-    hooks = get_hooks("pkg_intree")
+@pytest.mark.parametrize("example", ("pkg_intree", "pkg_nested_intree"))
+def test_intree_backend(example):
+    hooks = get_hooks(example)
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
         res = hooks.get_requires_for_build_sdist({})
     assert res == ["intree_backend_called"]
