@@ -60,10 +60,11 @@ def test_intree_backend(example):
     assert res == ["intree_backend_called"]
 
 
-def test_intree_backend_not_in_path():
-    hooks = get_hooks("pkg_intree", backend="buildsys")
+@pytest.mark.parametrize("backend", ("buildsys", "nested.buildsys"))
+def test_intree_backend_not_in_path(backend):
+    hooks = get_hooks("pkg_intree", backend=backend)
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
-        msg = "Cannot find module 'buildsys' in .*pkg_intree.*backend"
+        msg = f"Cannot find module {backend!r} in .*pkg_intree.*backend"
         with pytest.raises(BackendUnavailable, match=msg):
             hooks.get_requires_for_build_sdist({})
 
