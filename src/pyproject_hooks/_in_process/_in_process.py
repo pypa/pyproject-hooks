@@ -89,15 +89,21 @@ class _BackendPathFinder:
     def __init__(self, backend_path, backend_module):
         self.backend_path = backend_path
         self.backend_module = backend_module
+        self.backend_parent, _, _ = backend_module.partition(".")
 
     def find_spec(self, fullname, _path, _target=None):
+        if "." in fullname:
+            # Rely on importlib to find nested modules based on parent's path
+            return None
+
         # Ignore other items in _path or sys.path and use backend_path instead:
         spec = PathFinder.find_spec(fullname, path=self.backend_path)
-        if spec is None and fullname == self.backend_module:
+        if spec is None and fullname == self.backend_parent:
             # According to the spec, the backend MUST be loaded from backend-path.
             # Therefore, we can halt the import machinery and raise a clean error.
             msg = f"Cannot find module {self.backend_module!r} in {self.backend_path!r}"
             raise BackendUnavailable(msg)
+
         return spec
 
 
