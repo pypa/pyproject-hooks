@@ -2,7 +2,6 @@
 """
 
 from ._impl import (
-    BackendInvalid,
     BackendUnavailable,
     BuildBackendHookCaller,
     HookMissing,
@@ -14,7 +13,6 @@ from ._impl import (
 __version__ = "1.0.0"
 __all__ = [
     "BackendUnavailable",
-    "BackendInvalid",
     "HookMissing",
     "UnsupportedOperation",
     "default_subprocess_runner",

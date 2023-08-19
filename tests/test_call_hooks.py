@@ -34,8 +34,10 @@ def get_hooks(pkg, **kwargs):
 def test_missing_backend_gives_exception():
     hooks = get_hooks("pkg1")
     with modified_env({"PYTHONPATH": ""}):
-        with pytest.raises(BackendUnavailable):
+        msg = "Cannot import 'buildsys'"
+        with pytest.raises(BackendUnavailable, match=msg) as exc:
             hooks.get_requires_for_build_wheel({})
+        assert exc.value.backend_name == "buildsys"
 
 
 def test_get_requires_for_build_wheel():
