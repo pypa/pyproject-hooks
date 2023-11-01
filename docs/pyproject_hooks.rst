@@ -22,17 +22,30 @@ Custom Subprocess Runners
 
 It is possible to provide a custom subprocess runner, that behaves differently. The expected protocol for subprocess runners is as follows:
 
-.. function:: subprocess_runner_protocol(cmd, cwd, extra_environ)
+.. function:: subprocess_runner_protocol(cmd, cwd=None, extra_environ=None)
    :noindex:
 
    :param cmd: The command and arguments to execute, as would be passed to :func:`subprocess.run`.
-   :type cmd: list[str]
+   :type cmd: typing.Sequence[str]
    :param cwd: The working directory that must be used for the subprocess.
-   :type cwd: str
+   :type cwd: typing.Optional[str]
    :param extra_environ: Mapping of environment variables (name to value) which must be set for the subprocess execution.
-   :type extra_environ: dict[str, str]
+   :type extra_environ: typing.Optional[typing.Mapping[str, str]]
 
    :rtype: None
+
+Since this codebase is currently Python 3.7-compatible, the type annotation for this protocol is only available to type checkers. To annotate a variable as a subprocess runner, you can do something along the lines of:
+
+.. code-block:: python
+
+   from typing import TYPE_CHECKING
+
+   if TYPE_CHECKING:
+      from pyproject_hooks import SubprocessRunner
+
+   # Example usage
+   def build(awesome_runner: "SubprocessRunner") -> None:
+      ...
 
 Exceptions
 ----------

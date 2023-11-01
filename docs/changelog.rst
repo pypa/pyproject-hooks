@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1
+----
+
+- Add type annotations to the public API.
+
 v1.0
 ----
 

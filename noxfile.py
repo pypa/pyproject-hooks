@@ -6,7 +6,7 @@ import nox
 nox.options.reuse_existing_virtualenvs = True
 
 
-@nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11", "pypy3"])
+@nox.session(python=["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "pypy3"])
 def test(session: nox.Session) -> None:
     session.install("-r", "dev-requirements.txt")
     session.install(".")
@@ -40,7 +40,7 @@ def lint(session: nox.Session) -> None:
     session.run("pre-commit", "run", *args)
 
 
-@nox.session(name="docs-live")
+@nox.session
 def release(session: nox.Session) -> None:
     session.install("flit")
     session.run("flit", "publish")

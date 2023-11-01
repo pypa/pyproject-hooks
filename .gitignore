@@ -3,7 +3,7 @@ __pycache__/
 /dist/
 .nox
 .pytest_cache
-doc/_build/
+docs/_build/
 *.egg-info/
 .coverage
 htmlcov/
