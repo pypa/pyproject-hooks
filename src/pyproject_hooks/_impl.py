@@ -37,7 +37,7 @@ def read_json(path: str) -> Mapping[str, Any]:
 
 class BackendUnavailable(Exception):
     """Will be raised if the backend cannot be imported in the hook process."""
-    
+
     def __init__(
         self,
         traceback: str,
