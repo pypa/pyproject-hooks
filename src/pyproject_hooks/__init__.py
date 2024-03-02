@@ -12,10 +12,6 @@ from ._impl import (
     quiet_subprocess_runner,
 )
 
-if TYPE_CHECKING:
-    from ._impl import SubprocessRunner
-
-
 __version__ = "1.0.0"
 __all__ = [
     "BackendUnavailable",
@@ -24,5 +20,9 @@ __all__ = [
     "default_subprocess_runner",
     "quiet_subprocess_runner",
     "BuildBackendHookCaller",
-    "SubprocessRunner",
 ]
+
+if TYPE_CHECKING:
+    from ._impl import SubprocessRunner
+
+    __all__ += ["SubprocessRunner"]
