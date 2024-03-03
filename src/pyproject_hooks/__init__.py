@@ -23,4 +23,6 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from ._impl import SubprocessRunner  # noqa: F401
+    from ._impl import SubprocessRunner
+
+    __all__ += ["SubprocessRunner"]
