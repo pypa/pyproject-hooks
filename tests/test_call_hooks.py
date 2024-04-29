@@ -16,6 +16,7 @@ from pyproject_hooks import (
     UnsupportedOperation,
     default_subprocess_runner,
 )
+from pyproject_hooks._in_process import _in_proc_script_path as in_proc_script_path
 from tests.compat import tomllib
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), "samples")
@@ -196,14 +197,11 @@ def test_path_pollution():
         ):
             hooks.get_requires_for_build_wheel({})
         with open(pjoin(outdir, "out.json")) as f:
-            children = json.load(f)
-    assert set(children) <= {
-        "__init__.py",
-        "__init__.pyc",
-        "_in_process.py",
-        "_in_process.pyc",
-        "__pycache__",
-    }
+            captured_sys_path = json.load(f)
+
+    with in_proc_script_path() as path:
+        assert os.path.dirname(path) not in captured_sys_path
+    assert captured_sys_path[0] == BUILDSYS_PKGS
 
 
 def test_setup_py():

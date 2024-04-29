@@ -348,6 +348,13 @@ def main():
     control_dir = sys.argv[2]
     if hook_name not in HOOK_NAMES:
         sys.exit("Unknown hook: %s" % hook_name)
+
+    # Remove the parent directory from sys.path to avoid polluting the backend
+    # import namespace with this directory.
+    here = os.path.dirname(__file__)
+    if here in sys.path:
+        sys.path.remove(here)
+
     hook = globals()[hook_name]
 
     hook_input = read_json(pjoin(control_dir, "input.json"))
