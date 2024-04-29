@@ -5,6 +5,11 @@ v1.1
 ----
 
 - Add type annotations to the public API.
+- More careful handling of the ``backend-path`` key from ``pyproject.toml``.
+  Previous versions would load the backend and then check that it was loaded
+  from the specified path; the new version only loads it from the specified path.
+  The ``BackendInvalid`` exception is now a synonym for :exc:`BackendUnavailable`,
+  and code should move to using the latter name.
 
 v1.0
 ----
