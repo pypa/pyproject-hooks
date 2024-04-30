@@ -8,6 +8,7 @@ authors = [
     {name = "Thomas Kluyver", email = "thomas@kluyver.me.uk"},
 ]
 readme = "README.rst"
+license = {file = "LICENSE"}
 requires-python = ">=3.7"
 dependencies = []
 classifiers = [
@@ -21,6 +22,18 @@ dynamic = ["version", "description"]
 Source = "https://github.com/pypa/pyproject-hooks"
 Documentation = "https://pyproject-hooks.readthedocs.io/"
 Changelog = "https://pyproject-hooks.readthedocs.io/en/latest/changelog.html"
+
+[tool.flit.sdist]
+include = [
+    "tests/",
+    "docs/",
+    "dev-requirements.txt",
+    "noxfile.py",
+    "pytest.ini",
+]
+exclude = [
+    "docs/_build"
+]
 
 [tool.ruff]
 src = ["src", "tests"]
