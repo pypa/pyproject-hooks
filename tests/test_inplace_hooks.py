@@ -1,4 +1,3 @@
-import sys
 from inspect import cleandoc
 from os.path import abspath, dirname
 from os.path import join as pjoin
@@ -90,8 +89,9 @@ def test_intree_backend_loaded_from_correct_backend_path():
     assert res == ["intree_backend_called"]
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="no importlib.metadata")
 def test_intree_backend_importlib_metadata_interoperation():
+    pytest.importorskip("importlib.metadata")
+
     hooks = get_hooks("pkg_intree_metadata", backend="intree_backend")
     assert hooks.get_requires_for_build_sdist({}) == [
         "_test_backend.importlib_metadata",
