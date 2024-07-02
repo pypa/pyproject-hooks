@@ -106,6 +106,15 @@ class _BackendPathFinder:
 
         return spec
 
+    if sys.version_info >= (3, 8):
+
+        def find_distributions(self, context=None):
+            # Delayed import: Python 3.7 does not contain importlib.metadata
+            from importlib.metadata import DistributionFinder, MetadataPathFinder
+
+            context = DistributionFinder.Context(path=self.backend_path)
+            return MetadataPathFinder.find_distributions(context=context)
+
 
 def _supported_features():
     """Return the list of options features supported by the backend.

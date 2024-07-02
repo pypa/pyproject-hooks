@@ -1,0 +1,3 @@
+[build-system]
+build-backend = 'intree_backend'
+backend-path = ['backend']
