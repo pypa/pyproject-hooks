@@ -6,9 +6,20 @@ from contextlib import contextmanager
 from os.path import abspath
 from os.path import join as pjoin
 from subprocess import STDOUT, check_call, check_output
-from typing import TYPE_CHECKING, Any, Iterator, Mapping, Optional, Sequence
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Union,
+)
 
 from ._in_process import _in_proc_script_path
+
+StrPath = Union[str, "os.PathLike[str]"]
 
 if TYPE_CHECKING:
     from typing import Protocol
@@ -18,19 +29,19 @@ if TYPE_CHECKING:
 
         def __call__(
             self,
-            cmd: Sequence[str],
-            cwd: Optional[str] = None,
+            cmd: Sequence[StrPath],
+            cwd: Optional[StrPath] = None,
             extra_environ: Optional[Mapping[str, str]] = None,
         ) -> None:
             ...
 
 
-def write_json(obj: Mapping[str, Any], path: str, **kwargs) -> None:
+def write_json(obj: Mapping[str, Any], path: StrPath, **kwargs) -> None:
     with open(path, "w", encoding="utf-8") as f:
         json.dump(obj, f, **kwargs)
 
 
-def read_json(path: str) -> Mapping[str, Any]:
+def read_json(path: StrPath) -> Mapping[str, Any]:
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
@@ -43,7 +54,7 @@ class BackendUnavailable(Exception):
         traceback: str,
         message: Optional[str] = None,
         backend_name: Optional[str] = None,
-        backend_path: Optional[Sequence[str]] = None,
+        backend_path: Optional[Sequence[StrPath]] = None,
     ) -> None:
         # Preserving arg order for the sake of API backward compatibility.
         self.backend_name = backend_name
@@ -68,8 +79,8 @@ class UnsupportedOperation(Exception):
 
 
 def default_subprocess_runner(
-    cmd: Sequence[str],
-    cwd: Optional[str] = None,
+    cmd: Sequence[StrPath],
+    cwd: Optional[StrPath] = None,
     extra_environ: Optional[Mapping[str, str]] = None,
 ) -> None:
     """The default method of calling the wrapper subprocess.
@@ -84,8 +95,8 @@ def default_subprocess_runner(
 
 
 def quiet_subprocess_runner(
-    cmd: Sequence[str],
-    cwd: Optional[str] = None,
+    cmd: Sequence[StrPath],
+    cwd: Optional[StrPath] = None,
     extra_environ: Optional[Mapping[str, str]] = None,
 ) -> None:
     """Call the subprocess while suppressing output.
@@ -99,7 +110,7 @@ def quiet_subprocess_runner(
     check_output(cmd, cwd=cwd, env=env, stderr=STDOUT)
 
 
-def norm_and_check(source_tree: str, requested: str) -> str:
+def norm_and_check(source_tree: StrPath, requested: StrPath) -> str:
     """Normalise and check a backend path.
 
     Ensure that the requested backend path is specified as a relative path,
@@ -128,11 +139,11 @@ class BuildBackendHookCaller:
 
     def __init__(
         self,
-        source_dir: str,
+        source_dir: StrPath,
         build_backend: str,
-        backend_path: Optional[Sequence[str]] = None,
+        backend_path: Optional[Sequence[StrPath]] = None,
         runner: Optional["SubprocessRunner"] = None,
-        python_executable: Optional[str] = None,
+        python_executable: Optional[StrPath] = None,
     ) -> None:
         """
         :param source_dir: The source directory to invoke the build backend for
@@ -147,9 +158,11 @@ class BuildBackendHookCaller:
 
         self.source_dir = abspath(source_dir)
         self.build_backend = build_backend
-        if backend_path:
-            backend_path = [norm_and_check(self.source_dir, p) for p in backend_path]
-        self.backend_path = backend_path
+        self.backend_path: Optional[List[str]] = (
+            [norm_and_check(self.source_dir, p) for p in backend_path]
+            if backend_path is not None
+            else None
+        )
         self._subprocess_runner = runner
         if not python_executable:
             python_executable = sys.executable
@@ -199,7 +212,7 @@ class BuildBackendHookCaller:
 
     def prepare_metadata_for_build_wheel(
         self,
-        metadata_directory: str,
+        metadata_directory: StrPath,
         config_settings: Optional[Mapping[str, Any]] = None,
         _allow_fallback: bool = True,
     ) -> str:
@@ -232,9 +245,9 @@ class BuildBackendHookCaller:
 
     def build_wheel(
         self,
-        wheel_directory: str,
+        wheel_directory: StrPath,
         config_settings: Optional[Mapping[str, Any]] = None,
-        metadata_directory: Optional[str] = None,
+        metadata_directory: Optional[StrPath] = None,
     ) -> str:
         """Build a wheel from this project.
 
@@ -282,7 +295,7 @@ class BuildBackendHookCaller:
 
     def prepare_metadata_for_build_editable(
         self,
-        metadata_directory: str,
+        metadata_directory: StrPath,
         config_settings: Optional[Mapping[str, Any]] = None,
         _allow_fallback: bool = True,
     ) -> Optional[str]:
@@ -314,9 +327,9 @@ class BuildBackendHookCaller:
 
     def build_editable(
         self,
-        wheel_directory: str,
+        wheel_directory: StrPath,
         config_settings: Optional[Mapping[str, Any]] = None,
-        metadata_directory: Optional[str] = None,
+        metadata_directory: Optional[StrPath] = None,
     ) -> str:
         """Build an editable wheel from this project.
 
@@ -359,7 +372,7 @@ class BuildBackendHookCaller:
 
     def build_sdist(
         self,
-        sdist_directory: str,
+        sdist_directory: StrPath,
         config_settings: Optional[Mapping[str, Any]] = None,
     ) -> str:
         """Build an sdist from this project.
