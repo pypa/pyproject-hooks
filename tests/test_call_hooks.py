@@ -207,10 +207,9 @@ def test_path_pollution():
 def test_setup_py():
     hooks = get_hooks("setup-py")
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
-        res = hooks.get_requires_for_build_wheel({})
-    # Some versions of setuptools list setuptools itself here
-    res = [x for x in res if x != "setuptools"]
-    assert res == ["wheel"]
+        res = set(hooks.get_requires_for_build_wheel({}))
+    # Depending on the version of setuptools, it may be both, just wheel, or neither
+    assert res.issubset({"setuptools", "wheel"})
 
 
 @pytest.mark.parametrize(
