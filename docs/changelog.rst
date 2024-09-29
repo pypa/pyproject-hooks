@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v1.2
+----
+
+- Improve interoperability with ``importlib.metadata``, fixing a regression
+  in setuptools compatibility in 1.1 (#199).
+- Clean up the ``_in_process`` directory inside the package from ``sys.path``
+  before imporing the backend (#193).
+
 v1.1
 ----
 
