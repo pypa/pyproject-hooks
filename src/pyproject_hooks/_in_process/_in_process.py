@@ -376,8 +376,6 @@ def main():
         except BackendUnavailable as e:
             json_out["no_backend"] = True
             json_out["traceback"] = e.traceback
-        except BackendInvalid as e:
-            json_out["backend_invalid"] = True
             json_out["backend_error"] = e.message
         except GotUnsupportedOperation as e:
             json_out["unsupported"] = True
