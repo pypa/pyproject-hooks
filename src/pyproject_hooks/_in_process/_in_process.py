@@ -395,7 +395,6 @@ def main():
         for w in captured_warnings
         if isinstance(w.category, type) and issubclass(w.category, UserWarning)
     ]
-    print(json_out)
     write_json(json_out, pjoin(control_dir, "output.json"), indent=2)
 
 
