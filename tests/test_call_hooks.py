@@ -17,6 +17,7 @@ from pyproject_hooks import (
     UnsupportedOperation,
     default_subprocess_runner,
 )
+from pyproject_hooks._in_process import _in_proc_script_path as in_proc_script_path
 from tests.compat import tomllib
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), "samples")
@@ -35,8 +36,10 @@ def get_hooks(pkg, **kwargs):
 def test_missing_backend_gives_exception():
     hooks = get_hooks("pkg1")
     with modified_env({"PYTHONPATH": ""}):
-        with pytest.raises(BackendUnavailable):
+        msg = "Cannot import 'buildsys'"
+        with pytest.raises(BackendUnavailable, match=msg) as exc:
             hooks.get_requires_for_build_wheel({})
+        assert exc.value.backend_name == "buildsys"
 
 
 def test_get_requires_for_build_wheel():
@@ -195,23 +198,19 @@ def test_path_pollution():
         ):
             hooks.get_requires_for_build_wheel({})
         with open(pjoin(outdir, "out.json")) as f:
-            children = json.load(f)
-    assert set(children) <= {
-        "__init__.py",
-        "__init__.pyc",
-        "_in_process.py",
-        "_in_process.pyc",
-        "__pycache__",
-    }
+            captured_sys_path = json.load(f)
+
+    with in_proc_script_path() as path:
+        assert os.path.dirname(path) not in captured_sys_path
+    assert captured_sys_path[0] == BUILDSYS_PKGS
 
 
 def test_setup_py():
     hooks = get_hooks("setup-py")
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
-        res = hooks.get_requires_for_build_wheel({})
-    # Some versions of setuptools list setuptools itself here
-    res = [x for x in res if x != "setuptools"]
-    assert res == ["wheel"]
+        res = set(hooks.get_requires_for_build_wheel({}))
+    # Depending on the version of setuptools, it may be both, just wheel, or neither
+    assert res.issubset({"setuptools", "wheel"})
 
 
 @pytest.mark.parametrize(

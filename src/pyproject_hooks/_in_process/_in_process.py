@@ -21,6 +21,7 @@ import sys
 import traceback
 from glob import glob
 from importlib import import_module
+from importlib.machinery import PathFinder
 from os.path import join as pjoin
 import warnings
 
@@ -41,15 +42,10 @@ def read_json(path):
 class BackendUnavailable(Exception):
     """Raised if we cannot import the backend"""
 
-    def __init__(self, traceback):
-        self.traceback = traceback
-
-
-class BackendInvalid(Exception):
-    """Raised if the backend is invalid"""
-
-    def __init__(self, message):
+    def __init__(self, message, traceback=None):
+        super().__init__(message)
         self.message = message
+        self.traceback = traceback
 
 
 class HookMissing(Exception):
@@ -60,36 +56,65 @@ class HookMissing(Exception):
         self.hook_name = hook_name
 
 
-def contained_in(filename, directory):
-    """Test if a file is located within the given directory."""
-    filename = os.path.normcase(os.path.abspath(filename))
-    directory = os.path.normcase(os.path.abspath(directory))
-    return os.path.commonprefix([filename, directory]) == directory
-
-
 def _build_backend():
     """Find and load the build backend"""
-    # Add in-tree backend directories to the front of sys.path.
     backend_path = os.environ.get("_PYPROJECT_HOOKS_BACKEND_PATH")
-    if backend_path:
-        extra_pathitems = backend_path.split(os.pathsep)
-        sys.path[:0] = extra_pathitems
-
     ep = os.environ["_PYPROJECT_HOOKS_BUILD_BACKEND"]
     mod_path, _, obj_path = ep.partition(":")
+
+    if backend_path:
+        # Ensure in-tree backend directories have the highest priority when importing.
+        extra_pathitems = backend_path.split(os.pathsep)
+        sys.meta_path.insert(0, _BackendPathFinder(extra_pathitems, mod_path))
+
     try:
         obj = import_module(mod_path)
     except ImportError:
-        raise BackendUnavailable(traceback.format_exc())
-
-    if backend_path:
-        if not any(contained_in(obj.__file__, path) for path in extra_pathitems):
-            raise BackendInvalid("Backend was not loaded from backend-path")
+        msg = f"Cannot import {mod_path!r}"
+        raise BackendUnavailable(msg, traceback.format_exc())
 
     if obj_path:
         for path_part in obj_path.split("."):
             obj = getattr(obj, path_part)
     return obj
+
+
+class _BackendPathFinder:
+    """Implements the MetaPathFinder interface to locate modules in ``backend-path``.
+
+    Since the environment provided by the frontend can contain all sorts of
+    MetaPathFinders, the only way to ensure the backend is loaded from the
+    right place is to prepend our own.
+    """
+
+    def __init__(self, backend_path, backend_module):
+        self.backend_path = backend_path
+        self.backend_module = backend_module
+        self.backend_parent, _, _ = backend_module.partition(".")
+
+    def find_spec(self, fullname, _path, _target=None):
+        if "." in fullname:
+            # Rely on importlib to find nested modules based on parent's path
+            return None
+
+        # Ignore other items in _path or sys.path and use backend_path instead:
+        spec = PathFinder.find_spec(fullname, path=self.backend_path)
+        if spec is None and fullname == self.backend_parent:
+            # According to the spec, the backend MUST be loaded from backend-path.
+            # Therefore, we can halt the import machinery and raise a clean error.
+            msg = f"Cannot find module {self.backend_module!r} in {self.backend_path!r}"
+            raise BackendUnavailable(msg)
+
+        return spec
+
+    if sys.version_info >= (3, 8):
+
+        def find_distributions(self, context=None):
+            # Delayed import: Python 3.7 does not contain importlib.metadata
+            from importlib.metadata import DistributionFinder, MetadataPathFinder
+
+            context = DistributionFinder.Context(path=self.backend_path)
+            return MetadataPathFinder.find_distributions(context=context)
 
 
 def _supported_features():
@@ -333,6 +358,13 @@ def main():
     control_dir = sys.argv[2]
     if hook_name not in HOOK_NAMES:
         sys.exit("Unknown hook: %s" % hook_name)
+
+    # Remove the parent directory from sys.path to avoid polluting the backend
+    # import namespace with this directory.
+    here = os.path.dirname(__file__)
+    if here in sys.path:
+        sys.path.remove(here)
+
     hook = globals()[hook_name]
 
     hook_input = read_json(pjoin(control_dir, "input.json"))

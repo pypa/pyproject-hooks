@@ -30,8 +30,11 @@ html_theme = "furo"
 # -- Options for autodoc -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
 
+autodoc_class_signature = "separated"
 autodoc_member_order = "bysource"
+autodoc_preserve_defaults = True
 autodoc_typehints = "description"
+autodoc_typehints_description_target = "documented_params"
 
 # -- Options for intersphinx -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#configuration
