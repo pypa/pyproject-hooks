@@ -4,6 +4,7 @@
 from typing import TYPE_CHECKING
 
 from ._impl import (
+    BuildBackendWarning,
     BackendUnavailable,
     BuildBackendHookCaller,
     HookMissing,
@@ -14,6 +15,7 @@ from ._impl import (
 
 __version__ = "1.2.0"
 __all__ = [
+    "BuildBackendWarning",
     "BackendUnavailable",
     "BackendInvalid",
     "HookMissing",
