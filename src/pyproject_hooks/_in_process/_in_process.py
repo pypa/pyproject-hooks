@@ -23,6 +23,7 @@ from glob import glob
 from importlib import import_module
 from importlib.machinery import PathFinder
 from os.path import join as pjoin
+import warnings
 
 # This file is run as a script, and `import wrappers` is not zip-safe, so we
 # include write_json() and read_json() from wrappers.py.
@@ -368,20 +369,30 @@ def main():
 
     hook_input = read_json(pjoin(control_dir, "input.json"))
 
-    json_out = {"unsupported": False, "return_val": None}
-    try:
-        json_out["return_val"] = hook(**hook_input["kwargs"])
-    except BackendUnavailable as e:
-        json_out["no_backend"] = True
-        json_out["traceback"] = e.traceback
-        json_out["backend_error"] = e.message
-    except GotUnsupportedOperation as e:
-        json_out["unsupported"] = True
-        json_out["traceback"] = e.traceback
-    except HookMissing as e:
-        json_out["hook_missing"] = True
-        json_out["missing_hook_name"] = e.hook_name or hook_name
+    with warnings.catch_warnings(record=True) as captured_warnings:
+        json_out = {"unsupported": False, "return_val": None}
+        try:
+            json_out["return_val"] = hook(**hook_input["kwargs"])
+        except BackendUnavailable as e:
+            json_out["no_backend"] = True
+            json_out["traceback"] = e.traceback
+            json_out["backend_error"] = e.message
+        except GotUnsupportedOperation as e:
+            json_out["unsupported"] = True
+            json_out["traceback"] = e.traceback
+        except HookMissing as e:
+            json_out["hook_missing"] = True
+            json_out["missing_hook_name"] = e.hook_name or hook_name
 
+    json_out["warnings"] = [
+        {
+            "message": str(w.message),
+            "filename": w.filename,
+            "lineno": w.lineno,
+        }
+        for w in captured_warnings
+        if isinstance(w.category, type) and issubclass(w.category, UserWarning)
+    ]
     write_json(json_out, pjoin(control_dir, "output.json"), indent=2)
 
 

@@ -12,6 +12,7 @@ from testpath.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
 
 from pyproject_hooks import (
     BackendUnavailable,
+    BuildBackendWarning,
     BuildBackendHookCaller,
     UnsupportedOperation,
     default_subprocess_runner,
@@ -225,3 +226,10 @@ def test__supported_features(pkg, expected):
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
         res = hooks._supported_features()
     assert res == expected
+
+
+def test_warnings():
+    hooks = get_hooks("pkg-with-warnings")
+    with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
+        with pytest.warns(BuildBackendWarning, match="this is my example warning"):
+            hooks.get_requires_for_build_wheel({})
