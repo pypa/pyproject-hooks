@@ -290,7 +290,7 @@ class BuildBackendHookCaller:
         metadata_directory: str,
         config_settings: Optional[Mapping[str, Any]] = None,
         _allow_fallback: bool = True,
-    ) -> Optional[str]:
+    ) -> str:
         """Prepare a ``*.dist-info`` folder with metadata for this project.
 
         :param metadata_directory: The directory to write the metadata to
