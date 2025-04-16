@@ -100,6 +100,13 @@ def test_intree_backend_importlib_metadata_interoperation():
     ]
 
 
+def test_distribution_mismatch():
+    pytest.importorskip("importlib.metadata")
+
+    hooks = get_hooks("distribution_mismatch")
+    assert hooks.get_requires_for_build_sdist({}) != ["0.0.1"]
+
+
 def install_finder_with_sitecustomize(directory, mapping):
     finder = f"""
         import sys

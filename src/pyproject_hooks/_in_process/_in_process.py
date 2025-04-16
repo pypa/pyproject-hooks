@@ -113,7 +113,8 @@ class _BackendPathFinder:
             # Delayed import: Python 3.7 does not contain importlib.metadata
             from importlib.metadata import DistributionFinder, MetadataPathFinder
 
-            context = DistributionFinder.Context(path=self.backend_path)
+            name = context.name if context else None
+            context = DistributionFinder.Context(name=name, path=self.backend_path)
             return MetadataPathFinder.find_distributions(context=context)
 
 
