@@ -2,10 +2,10 @@ import json
 import os
 import sys
 import tempfile
+import subprocess
 from contextlib import contextmanager
 from os.path import abspath
 from os.path import join as pjoin
-from subprocess import STDOUT, check_call, check_output
 from typing import TYPE_CHECKING, Any, Iterator, Mapping, Optional, Sequence
 import warnings
 
@@ -79,13 +79,13 @@ def default_subprocess_runner(
 ) -> None:
     """The default method of calling the wrapper subprocess.
 
-    This uses :func:`subprocess.check_call` under the hood.
+    This uses :func:`subprocess.run` under the hood.
     """
     env = os.environ.copy()
     if extra_environ:
         env.update(extra_environ)
 
-    check_call(cmd, cwd=cwd, env=env)
+    subprocess.run(cmd, cwd=cwd, env=env, check=True)
 
 
 def quiet_subprocess_runner(
@@ -95,13 +95,20 @@ def quiet_subprocess_runner(
 ) -> None:
     """Call the subprocess while suppressing output.
 
-    This uses :func:`subprocess.check_output` under the hood.
+    This uses :func:`subprocess.run` with `stdout=PIPE, stderr=STDOUT` under the hood.
     """
     env = os.environ.copy()
     if extra_environ:
         env.update(extra_environ)
 
-    check_output(cmd, cwd=cwd, env=env, stderr=STDOUT)
+    subprocess.run(
+        cmd,
+        cwd=cwd,
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=True,
+    )
 
 
 def norm_and_check(source_tree: str, requested: str) -> str:
