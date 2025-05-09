@@ -351,6 +351,32 @@ HOOK_NAMES = {
 }
 
 
+class _capture_warnings:
+    """Context manager to capture warnings while still showing them to the caller."""
+
+    def __init__(self):
+        self._captured_warnings = []
+        self._old_showwarning = None
+
+    def _showwarning(self, message, category, filename, lineno, file=None, line=None):
+        # Capture the warning
+        self._captured_warnings.append(
+            warnings.WarningMessage(message, category, filename, lineno, file, line)
+        )
+        # Call the original showwarning to display the warning
+        if self._old_showwarning is not None:
+            self._old_showwarning(message, category, filename, lineno, file, line)
+
+    def __enter__(self):
+        self._old_showwarning = warnings.showwarning
+        warnings.showwarning = self._showwarning
+        return self._captured_warnings
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        warnings.showwarning = self._old_showwarning
+        self._old_showwarning = None
+
+
 def main():
     if len(sys.argv) < 3:
         sys.exit("Needs args: hook_name, control_dir")
@@ -369,7 +395,7 @@ def main():
 
     hook_input = read_json(pjoin(control_dir, "input.json"))
 
-    with warnings.catch_warnings(record=True) as captured_warnings:
+    with _capture_warnings() as captured_warnings:
         json_out = {"unsupported": False, "return_val": None}
         try:
             json_out["return_val"] = hook(**hook_input["kwargs"])
