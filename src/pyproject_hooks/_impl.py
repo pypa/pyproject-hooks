@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 from contextlib import contextmanager
+from itertools import chain
 from os.path import abspath
 from os.path import join as pjoin
 from subprocess import STDOUT, check_call, check_output
@@ -380,6 +381,15 @@ class BuildBackendHookCaller:
             },
         )
 
+    def _get_warnopts(self) -> Iterator[str]:
+        """
+        Reconstruct Python's warn options that are active for the current process,
+        so that it can be forwarded to a subprocess.
+        """
+        # `sys.warnoptions` is documented/mentioned in
+        # https://docs.python.org/3.13/library/warnings.html#describing-warning-filters
+        return chain.from_iterable(("-W", opt) for opt in sys.warnoptions)
+
     def _call_hook(self, hook_name: str, kwargs: Mapping[str, Any]) -> Any:
         extra_environ = {"_PYPROJECT_HOOKS_BUILD_BACKEND": self.build_backend}
 
@@ -394,8 +404,9 @@ class BuildBackendHookCaller:
             # Run the hook in a subprocess
             with _in_proc_script_path() as script:
                 python = self.python_executable
+                opts = self._get_warnopts()
                 self._subprocess_runner(
-                    [python, abspath(str(script)), hook_name, td],
+                    [python, *opts, abspath(str(script)), hook_name, td],
                     cwd=self.source_dir,
                     extra_environ=extra_environ,
                 )
