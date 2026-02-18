@@ -119,7 +119,7 @@ def norm_and_check(source_tree: str, requested: str) -> str:
     abs_requested = os.path.normpath(os.path.join(abs_source, requested))
     norm_source = os.path.normcase(abs_source)
     norm_requested = os.path.normcase(abs_requested)
-    if not norm_requested.startswith(norm_source + os.sep):
+    if not (norm_requested + os.sep).startswith(norm_source + os.sep):
         raise ValueError("paths must be inside source tree")
 
     return abs_requested
