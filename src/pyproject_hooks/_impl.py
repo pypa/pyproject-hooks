@@ -175,6 +175,13 @@ class BuildBackendHookCaller:
 
         :param runner: The new subprocess runner to use within the context.
 
+        .. warning::
+
+            This context manager temporarily mutates the hook caller instance and
+            is not thread-safe. Callers that need to run hooks concurrently
+            should create separate :class:`BuildBackendHookCaller` instances, or
+            provide the subprocess runner when constructing the caller.
+
         .. code-block:: python
 
             hook_caller = BuildBackendHookCaller(...)
