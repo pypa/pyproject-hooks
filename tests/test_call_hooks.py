@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import json
 import os
 import tarfile
@@ -10,6 +11,7 @@ import pytest
 from testpath import assert_isfile, modified_env
 from testpath.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
 
+import pyproject_hooks._impl as impl
 from pyproject_hooks import (
     BackendUnavailable,
     BuildBackendWarning,
@@ -202,6 +204,35 @@ def test_path_pollution():
 
     with in_proc_script_path() as path:
         assert os.path.dirname(path) not in captured_sys_path
+    assert captured_sys_path[0] == BUILDSYS_PKGS
+
+
+def test_path_pollution_symlinked_in_process(monkeypatch):
+    hooks = get_hooks("path-pollution")
+    with TemporaryDirectory() as link_root:
+        with in_proc_script_path() as path:
+            link_parent = pjoin(link_root, "alias")
+            os.symlink(os.path.dirname(path), link_parent)
+
+        @contextmanager
+        def symlinked_in_proc_script_path():
+            yield pjoin(link_parent, os.path.basename(path))
+
+        monkeypatch.setattr(impl, "_in_proc_script_path", symlinked_in_proc_script_path)
+
+        with TemporaryDirectory() as outdir:
+            with modified_env(
+                {
+                    "PYTHONPATH": BUILDSYS_PKGS,
+                    "TEST_POLLUTION_OUTDIR": outdir,
+                }
+            ):
+                hooks.get_requires_for_build_wheel({})
+            with open(pjoin(outdir, "out.json")) as f:
+                captured_sys_path = json.load(f)
+
+    assert link_parent not in captured_sys_path
+    assert os.path.realpath(link_parent) not in captured_sys_path
     assert captured_sys_path[0] == BUILDSYS_PKGS
 
 
