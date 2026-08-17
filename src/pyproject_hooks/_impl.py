@@ -401,6 +401,9 @@ class BuildBackendHookCaller:
         if self.backend_path:
             backend_path = os.pathsep.join(self.backend_path)
             extra_environ["_PYPROJECT_HOOKS_BACKEND_PATH"] = backend_path
+            extra_environ["_PYPROJECT_HOOKS_BACKEND_PATH_JSON"] = json.dumps(
+                self.backend_path
+            )
 
         with tempfile.TemporaryDirectory() as td:
             hook_input = {"kwargs": kwargs}
