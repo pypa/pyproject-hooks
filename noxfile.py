@@ -1,12 +1,13 @@
-"""Automation using nox.
-"""
+"""Automation using nox."""
 
 import nox
 
 nox.options.reuse_existing_virtualenvs = True
 
 
-@nox.session(python=["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3"])
+@nox.session(
+    python=["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3"], venv_backend="venv"
+)
 def test(session: nox.Session) -> None:
     session.install("-r", "dev-requirements.txt")
     session.install(".")
