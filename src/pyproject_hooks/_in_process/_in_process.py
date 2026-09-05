@@ -362,9 +362,10 @@ def main():
 
     # Remove the parent directory from sys.path to avoid polluting the backend
     # import namespace with this directory.
-    here = os.path.dirname(__file__)
-    if here in sys.path:
-        sys.path.remove(here)
+    here = os.path.normcase(os.path.realpath(os.path.dirname(__file__)))
+    sys.path[:] = [
+        path for path in sys.path if os.path.normcase(os.path.realpath(path)) != here
+    ]
 
     hook = globals()[hook_name]
 
