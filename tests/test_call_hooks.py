@@ -4,6 +4,7 @@ import tarfile
 import zipfile
 from os.path import abspath, dirname
 from os.path import join as pjoin
+from subprocess import CalledProcessError
 from unittest.mock import Mock
 
 import pytest
@@ -232,4 +233,26 @@ def test_warnings():
     hooks = get_hooks("pkg-with-warnings")
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
         with pytest.warns(BuildBackendWarning, match="this is my example warning"):
+            hooks.get_requires_for_build_wheel({})
+
+
+def test_forward_warnopts(monkeypatch, recwarn):
+    hooks = get_hooks("pkg-with-warnings")
+
+    monkeypatch.setattr(
+        BuildBackendHookCaller, "_get_warnopts", lambda _: ["-W", "ignore"]
+    )
+    with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
+        hooks.get_requires_for_build_wheel({})
+        assert len(recwarn) == 0  # All subprocess warnings were ignored.
+
+    monkeypatch.setattr(
+        BuildBackendHookCaller, "_get_warnopts", lambda _: ["-W", "error"]
+    )
+    with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
+        with pytest.raises(CalledProcessError):
+            # The `match` argument does not work against the exception in the
+            # subprocess, but  we have a sanity check in place: the same call
+            # worked above when the warnings were ignored, so we known this is
+            # caused by the new warnings filter.
             hooks.get_requires_for_build_wheel({})
