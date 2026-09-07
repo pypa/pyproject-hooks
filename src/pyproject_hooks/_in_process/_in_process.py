@@ -4,8 +4,7 @@ It expects:
 - Command line args: hook_name, control_dir
 - Environment variables:
       _PYPROJECT_HOOKS_BUILD_BACKEND=entry.point:spec
-      _PYPROJECT_HOOKS_BACKEND_PATH=paths (separated with os.pathsep)
-      _PYPROJECT_HOOKS_BACKEND_PATH_JSON=paths (JSON encoded; preferred)
+      _PYPROJECT_HOOKS_BACKEND_PATH_JSON=paths (JSON encoded)
 - control_dir/input.json:
   - {"kwargs": {...}}
 
@@ -59,15 +58,12 @@ class HookMissing(Exception):
 
 def _build_backend():
     """Find and load the build backend"""
-    backend_path = os.environ.get("_PYPROJECT_HOOKS_BACKEND_PATH")
     backend_path_json = os.environ.get("_PYPROJECT_HOOKS_BACKEND_PATH_JSON")
     ep = os.environ["_PYPROJECT_HOOKS_BUILD_BACKEND"]
     mod_path, _, obj_path = ep.partition(":")
 
     if backend_path_json:
         extra_pathitems = json.loads(backend_path_json)
-    elif backend_path:
-        extra_pathitems = backend_path.split(os.pathsep)
     else:
         extra_pathitems = []
 

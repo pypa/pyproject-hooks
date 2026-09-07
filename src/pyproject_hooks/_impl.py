@@ -399,8 +399,6 @@ class BuildBackendHookCaller:
         extra_environ = {"_PYPROJECT_HOOKS_BUILD_BACKEND": self.build_backend}
 
         if self.backend_path:
-            backend_path = os.pathsep.join(self.backend_path)
-            extra_environ["_PYPROJECT_HOOKS_BACKEND_PATH"] = backend_path
             extra_environ["_PYPROJECT_HOOKS_BACKEND_PATH_JSON"] = json.dumps(
                 self.backend_path
             )
