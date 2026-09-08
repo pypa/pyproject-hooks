@@ -1,6 +1,26 @@
 Changelog
 =========
 
+v1.3
+----
+
+- Python 3.8 or above is now required (:pr:`214`).
+- Forward warnings from the backend to the frontend (:pr:`213`).
+- Show the traceback from the backend on a ``BackendUnavailable`` error (:pr:`219`).
+- Fix the return type annotation for ``prepare_metadata_for_build_wheel``
+  (:pr:`209`).
+- Fix removing the internal ``_in_process`` directory from ``sys.path`` where
+  the install location includes a symlink (:pr:`230`).
+- Use ``os.path.commonpath`` instead of the deprecated ``commonprefix`` to
+  validate the location of in-tree backends.
+- Fix in-tree backends in locations containing the path separator character -
+  ``:`` on Posix platforms, ``;`` on Windows (:pr:`232`).
+- Fix finding distribution metadata with ``importlib.metadata`` in the backend
+  when an in-tree backend is used (:pr:`212`).
+- ``pyproject_hooks`` can be built from source using flit_core 4.x (:pr:`233`).
+- Document that the ``hooks.subprocess_runner`` context manager API is not
+  thread-safe (:pr:227`)
+
 v1.2
 ----
 
