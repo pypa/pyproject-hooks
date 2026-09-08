@@ -1,7 +1,9 @@
 from inspect import cleandoc
+from os import pathsep
 from os.path import abspath, dirname
 from os.path import join as pjoin
 from pathlib import Path
+from shutil import copytree
 
 import pytest
 from testpath import modified_env
@@ -58,6 +60,14 @@ def test_intree_backend(example):
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
         res = hooks.get_requires_for_build_sdist({})
     assert res == ["intree_backend_called"]
+
+
+def test_intree_backend_path_containing_path_separator(tmp_path):
+    source_dir = tmp_path / f"project{pathsep}{pathsep}source"
+    copytree(Path(SAMPLES_DIR, "pkg_intree"), source_dir)
+    hooks = BuildBackendHookCaller(source_dir, "intree_backend", ["backend"])
+
+    assert hooks.get_requires_for_build_sdist({}) == ["intree_backend_called"]
 
 
 @pytest.mark.parametrize("backend", ("buildsys", "nested.buildsys"))
