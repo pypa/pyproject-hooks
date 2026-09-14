@@ -5,7 +5,9 @@ v1.3
 ----
 
 - Python 3.8 or above is now required (:pr:`214`).
-- Forward warnings from the backend to the frontend (:pr:`213`).
+- UserWarnings from the backend are now captured and re-emitted in the frontend
+  process as a new category ``BuildBackendWarning``, so that frontends can
+  control how they are shown to users (:pr:`213`).
 - Show the traceback from the backend on a ``BackendUnavailable`` error (:pr:`219`).
 - Fix the return type annotation for ``prepare_metadata_for_build_wheel``
   (:pr:`209`).
