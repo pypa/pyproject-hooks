@@ -385,7 +385,7 @@ class BuildBackendHookCaller:
         """Build an sdist from this project.
 
         :returns:
-            The name of the newly created sdist within ``wheel_directory``.
+            The name of the newly created sdist within ``sdist_directory``.
         """
         return self._call_hook(
             "build_sdist",
