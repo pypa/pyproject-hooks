@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v1.3.3
+------
+
+- No code changes from 1.3. The git tags and the version number got out of sync
+  while fixing an issue with the Github actions workflow to publish the release.
+  1.3.3 exists only to get them back in sync without reassigning any tags.
+
+
 v1.3
 ----
 
