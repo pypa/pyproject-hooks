@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+- Reuse a fallback-built wheel without copying it onto itself when the build
+  output directory already contains the cached wheel (:issue:`240`).
+
 v1.3.3
 ------
 

@@ -99,3 +99,29 @@ def test_prepare_metadata_for_build_editable_no_fallback():
             e = exc_info.value
             assert "prepare_metadata_for_build_editable" == e.hook_name
             assert "prepare_metadata_for_build_editable" in str(e)
+
+
+@pytest.mark.parametrize("pkg, kind", [("pkg2", "wheel"), ("pkg3", "editable")])
+@pytest.mark.parametrize("same_directory", [False, True])
+def test_reuse_fallback_wheel(tmp_path, monkeypatch, pkg, kind, same_directory):
+    monkeypatch.setenv("PYTHONPATH", BUILDSYS_PKGS)
+    hooks = get_hooks(pkg)
+    metadata_root = tmp_path / "metadata"
+    metadata_root.mkdir()
+    metadata_name = getattr(hooks, "prepare_metadata_for_build_" + kind)(
+        str(metadata_root)
+    )
+    cached_wheel = next(metadata_root.glob("*.whl"))
+    with cached_wheel.open("ab") as f:
+        f.write(b"cached wheel")
+    expected = cached_wheel.read_bytes()
+    wheel_directory = metadata_root if same_directory else tmp_path / "wheels"
+    wheel_directory.mkdir(exist_ok=True)
+
+    wheel_name = getattr(hooks, "build_" + kind)(
+        str(wheel_directory),
+        metadata_directory=str(metadata_root / metadata_name),
+    )
+
+    assert wheel_name == cached_wheel.name
+    assert (wheel_directory / wheel_name).read_bytes() == expected

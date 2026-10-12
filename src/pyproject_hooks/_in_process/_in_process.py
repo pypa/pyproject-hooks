@@ -280,7 +280,9 @@ def build_wheel(wheel_directory, config_settings, metadata_directory=None):
     """
     prebuilt_whl = _find_already_built_wheel(metadata_directory)
     if prebuilt_whl:
-        shutil.copy2(prebuilt_whl, wheel_directory)
+        target = pjoin(wheel_directory, os.path.basename(prebuilt_whl))
+        if not (os.path.exists(target) and os.path.samefile(prebuilt_whl, target)):
+            shutil.copy2(prebuilt_whl, wheel_directory)
         return os.path.basename(prebuilt_whl)
 
     return _build_backend().build_wheel(
@@ -303,7 +305,9 @@ def build_editable(wheel_directory, config_settings, metadata_directory=None):
     else:
         prebuilt_whl = _find_already_built_wheel(metadata_directory)
         if prebuilt_whl:
-            shutil.copy2(prebuilt_whl, wheel_directory)
+            target = pjoin(wheel_directory, os.path.basename(prebuilt_whl))
+            if not (os.path.exists(target) and os.path.samefile(prebuilt_whl, target)):
+                shutil.copy2(prebuilt_whl, wheel_directory)
             return os.path.basename(prebuilt_whl)
 
         return hook(wheel_directory, config_settings, metadata_directory)
