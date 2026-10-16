@@ -1,3 +1,4 @@
+import os
 from inspect import cleandoc
 from os import pathsep
 from os.path import abspath, dirname
@@ -52,6 +53,51 @@ def test_backend_out_of_tree(backend_path):
     # TODO: Do we want to insist on ValueError, or invent another exception?
     with pytest.raises(Exception):
         BuildBackendHookCaller(SOURCE_DIR, "dummy", backend_path)
+
+
+def test_backend_path_symlink_outside_tree(tmp_path):
+    source_tree = tmp_path / "project"
+    source_tree.mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    _directory_symlink_or_skip(source_tree / "backend", outside)
+
+    with pytest.raises(ValueError, match="paths must be inside source tree"):
+        BuildBackendHookCaller(source_tree, "dummy", ["backend"])
+
+
+def test_backend_path_symlink_inside_tree_preserves_path(tmp_path):
+    source_tree = tmp_path / "project"
+    source_tree.mkdir()
+    backend_target = source_tree / "actual-backend"
+    backend_target.mkdir()
+    backend_link = source_tree / "backend"
+    _directory_symlink_or_skip(backend_link, backend_target)
+
+    hooks = BuildBackendHookCaller(source_tree, "dummy", ["backend"])
+
+    expected = os.path.normpath(os.path.abspath(os.path.join(source_tree, "backend")))
+    assert hooks.backend_path == [expected]
+
+
+def test_backend_path_with_symlinked_source_root_preserves_path(tmp_path):
+    source_tree = tmp_path / "actual-project"
+    source_tree.mkdir()
+    (source_tree / "backend").mkdir()
+    source_link = tmp_path / "project-link"
+    _directory_symlink_or_skip(source_link, source_tree)
+
+    hooks = BuildBackendHookCaller(source_link, "dummy", ["backend"])
+
+    expected = os.path.normpath(os.path.abspath(os.path.join(source_link, "backend")))
+    assert hooks.backend_path == [expected]
+
+
+def _directory_symlink_or_skip(link, target):
+    try:
+        link.symlink_to(target, target_is_directory=True)
+    except (NotImplementedError, OSError) as exc:
+        pytest.skip(f"directory symlink creation is unavailable: {exc}")
 
 
 @pytest.mark.parametrize("example", ("pkg_intree", "pkg_nested_intree"))

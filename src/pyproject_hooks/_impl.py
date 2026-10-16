@@ -128,8 +128,8 @@ def norm_and_check(source_tree: str, requested: str) -> str:
 
     abs_source = os.path.abspath(source_tree)
     abs_requested = os.path.normpath(os.path.join(abs_source, requested))
-    norm_source = os.path.normcase(abs_source)
-    norm_requested = os.path.normcase(abs_requested)
+    norm_source = os.path.normcase(os.path.realpath(abs_source))
+    norm_requested = os.path.normcase(os.path.realpath(abs_requested))
     if os.path.commonpath([norm_source, norm_requested]) != norm_source:
         raise ValueError("paths must be inside source tree")
 
