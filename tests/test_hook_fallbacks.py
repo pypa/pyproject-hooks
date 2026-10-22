@@ -1,11 +1,13 @@
 from os.path import abspath, dirname
 from os.path import join as pjoin
+from unittest.mock import Mock
 
 import pytest
 from testpath import assert_isfile, modified_env
 from testpath.tempdir import TemporaryDirectory
 
 from pyproject_hooks import BuildBackendHookCaller, HookMissing
+from pyproject_hooks._in_process import _in_process
 from tests.compat import tomllib
 
 SAMPLES_DIR = pjoin(dirname(abspath(__file__)), "samples")
@@ -24,6 +26,35 @@ def test_get_requires_for_build_wheel():
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
         res = hooks.get_requires_for_build_wheel({})
     assert res == []
+
+
+@pytest.mark.parametrize(
+    "package,prepare_hook,build_hook",
+    [
+        ("pkg2", "prepare_metadata_for_build_wheel", "build_wheel"),
+        ("pkg3", "prepare_metadata_for_build_editable", "build_editable"),
+    ],
+)
+def test_fallback_reuses_wheel_in_path_with_brackets(
+    tmp_path, monkeypatch, package, prepare_hook, build_hook
+):
+    hooks = get_hooks(package)
+    metadata_dir = tmp_path / "metadata[1]"
+    metadata_dir.mkdir()
+    wheel_dir = tmp_path / "wheels"
+    wheel_dir.mkdir()
+    with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
+        dist_info = getattr(hooks, prepare_hook)(str(metadata_dir), {})
+
+    # Reusing the cached wheel must not call the backend hook again.
+    backend = Mock()
+    getattr(backend, build_hook).side_effect = AssertionError("backend called again")
+    monkeypatch.setattr(_in_process, "_build_backend", lambda: backend)
+    wheel = getattr(_in_process, build_hook)(
+        str(wheel_dir), {}, str(metadata_dir / dist_info)
+    )
+    getattr(backend, build_hook).assert_not_called()
+    assert (wheel_dir / wheel).is_file()
 
 
 def test_get_requires_for_build_editable():

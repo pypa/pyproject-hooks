@@ -19,7 +19,7 @@ import re
 import shutil
 import sys
 import traceback
-from glob import glob
+from glob import escape, glob
 from importlib import import_module
 from importlib.machinery import PathFinder
 from os.path import join as pjoin
@@ -256,7 +256,7 @@ def _find_already_built_wheel(metadata_directory):
     if not os.path.isfile(pjoin(metadata_parent, WHEEL_BUILT_MARKER)):
         return None
 
-    whl_files = glob(os.path.join(metadata_parent, "*.whl"))
+    whl_files = glob(os.path.join(escape(metadata_parent), "*.whl"))
     if not whl_files:
         print("Found wheel built marker, but no .whl files")
         return None
