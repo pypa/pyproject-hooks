@@ -70,7 +70,6 @@ def _build_backend():
     if extra_pathitems:
         # Ensure in-tree backend directories have the highest priority when importing.
         sys.meta_path.insert(0, _BackendPathFinder(extra_pathitems, mod_path))
-        _forget_shadowing_module(mod_path.partition(".")[0], extra_pathitems)
 
     try:
         obj = import_module(mod_path)
@@ -78,27 +77,28 @@ def _build_backend():
         msg = f"Cannot import {mod_path!r}"
         raise BackendUnavailable(msg, traceback.format_exc())
 
+    if extra_pathitems:
+        _check_loaded_from_backend_path(obj, mod_path, extra_pathitems)
+
     if obj_path:
         for path_part in obj_path.split("."):
             obj = getattr(obj, path_part)
     return obj
 
 
-def _forget_shadowing_module(name, backend_path):
-    module = sys.modules.get(name)
-    if module is None:
-        return
-    if name in sys.builtin_module_names:
-        msg = f"Cannot load backend {name!r} from {backend_path!r}: {name!r} is a built-in module"
-        raise BackendUnavailable(msg)
+def _check_loaded_from_backend_path(module, mod_path, backend_path):
     origin = getattr(module, "__file__", None)
     if origin and any(
         os.path.abspath(origin).startswith(os.path.join(os.path.abspath(path), ""))
         for path in backend_path
     ):
         return
-    for key in [k for k in sys.modules if k == name or k.startswith(name + ".")]:
-        del sys.modules[key]
+    msg = (
+        f"Backend {mod_path!r} was not loaded from {backend_path!r}: "
+        f"it resolved to {origin or 'a built-in module'!r}, so its name "
+        "is probably shadowed by an already imported module"
+    )
+    raise BackendUnavailable(msg)
 
 
 class _BackendPathFinder:
