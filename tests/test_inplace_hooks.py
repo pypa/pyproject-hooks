@@ -70,6 +70,34 @@ def test_intree_backend_path_containing_path_separator(tmp_path):
     assert hooks.get_requires_for_build_sdist({}) == ["intree_backend_called"]
 
 
+@pytest.mark.parametrize("backend", ("json", "re"))
+def test_intree_backend_named_like_an_imported_module(tmp_path, backend):
+    backend_dir = tmp_path / "backend"
+    backend_dir.mkdir()
+    (backend_dir / f"{backend}.py").write_text(
+        "def get_requires_for_build_sdist(config_settings=None):\n"
+        "    return ['intree_backend_called']\n",
+        encoding="utf-8",
+    )
+    hooks = BuildBackendHookCaller(str(tmp_path), backend, ["backend"])
+
+    assert hooks.get_requires_for_build_sdist({}) == ["intree_backend_called"]
+
+
+def test_intree_backend_named_like_a_builtin_module(tmp_path):
+    backend_dir = tmp_path / "backend"
+    backend_dir.mkdir()
+    (backend_dir / "sys.py").write_text(
+        "def get_requires_for_build_sdist(config_settings=None):\n"
+        "    return ['intree_backend_called']\n",
+        encoding="utf-8",
+    )
+    hooks = BuildBackendHookCaller(str(tmp_path), "sys", ["backend"])
+
+    with pytest.raises(BackendUnavailable, match="'sys' is a built-in module"):
+        hooks.get_requires_for_build_sdist({})
+
+
 @pytest.mark.parametrize("backend", ("buildsys", "nested.buildsys"))
 def test_intree_backend_not_in_path(backend):
     hooks = get_hooks("pkg_intree", backend=backend)
