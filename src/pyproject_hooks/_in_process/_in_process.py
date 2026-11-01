@@ -94,9 +94,8 @@ def _check_loaded_from_backend_path(module, mod_path, backend_path):
     ):
         return
     msg = (
-        f"Backend {mod_path!r} was not loaded from {backend_path!r}: "
-        f"it resolved to {origin or 'a built-in module'!r}, so its name "
-        "is probably shadowed by an already imported module"
+        f"Backend {mod_path!r} did not load from one of the paths specified in "
+        f"backend-path ({backend_path!r}), which is required for in-tree backends."
     )
     raise BackendUnavailable(msg)
 

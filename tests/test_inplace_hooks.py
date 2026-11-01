@@ -81,7 +81,7 @@ def test_intree_backend_shadowed_by_an_imported_module(tmp_path, backend):
     )
     hooks = BuildBackendHookCaller(str(tmp_path), backend, ["backend"])
 
-    msg = f"Backend {backend!r} was not loaded from .*backend.*already imported"
+    msg = f"Backend {backend!r} did not load from one of the paths specified in"
     with pytest.raises(BackendUnavailable, match=msg):
         hooks.get_requires_for_build_sdist({})
 
