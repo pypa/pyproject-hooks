@@ -44,6 +44,17 @@ def test_missing_backend_gives_exception():
         assert exc.value.backend_name == "buildsys"
 
 
+@pytest.mark.parametrize("obj_path", ["no_such_object", "build_wheel.no_such_attr"])
+def test_missing_backend_object_gives_exception(obj_path):
+    hooks = BuildBackendHookCaller(pjoin(SAMPLES_DIR, "pkg1"), f"buildsys:{obj_path}")
+    with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
+        msg = f"Cannot find '{obj_path}' in 'buildsys'"
+        with pytest.raises(BackendUnavailable, match=msg) as exc:
+            hooks.get_requires_for_build_wheel({})
+        assert exc.value.backend_name == f"buildsys:{obj_path}"
+        assert "AttributeError" in exc.value.traceback
+
+
 def test_get_requires_for_build_wheel():
     hooks = get_hooks("pkg1")
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
