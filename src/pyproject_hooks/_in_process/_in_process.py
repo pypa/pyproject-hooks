@@ -78,8 +78,12 @@ def _build_backend():
         raise BackendUnavailable(msg, traceback.format_exc())
 
     if obj_path:
-        for path_part in obj_path.split("."):
-            obj = getattr(obj, path_part)
+        try:
+            for path_part in obj_path.split("."):
+                obj = getattr(obj, path_part)
+        except AttributeError:
+            msg = f"Cannot find {obj_path!r} in {mod_path!r}"
+            raise BackendUnavailable(msg, traceback.format_exc())
     return obj
 
 
