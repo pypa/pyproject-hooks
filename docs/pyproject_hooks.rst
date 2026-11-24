@@ -17,6 +17,13 @@ The subprocess runners provided out-of-the-box with this library are:
 .. autofunction:: pyproject_hooks.default_subprocess_runner(...)
 .. autofunction:: pyproject_hooks.quiet_subprocess_runner(...)
 
+Both built-in runners raise :exc:`subprocess.CalledProcessError` if the
+subprocess exits with a nonzero status, for example when a backend hook raises
+an unhandled exception. The default runner leaves the subprocess output on the
+parent's standard streams. The quiet runner captures standard output and
+standard error together. On failure, use the exception's ``output`` attribute
+to inspect the captured bytes, which may include the backend traceback.
+
 Custom Subprocess Runners
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
