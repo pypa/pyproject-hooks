@@ -137,3 +137,9 @@ def install_finder_with_sitecustomize(directory, mapping):
     sitecustomize = "import _test_finder_; _test_finder_.install()"
     Path(directory, "_test_finder_.py").write_text(cleandoc(finder), encoding="utf-8")
     Path(directory, "sitecustomize.py").write_text(sitecustomize, encoding="utf-8")
+
+
+def test_intree_backend_named_like_stdlib_module():
+    """In-tree backends must win over pre-imported stdlib modules."""
+    hooks = get_hooks("pkg_json_intree")
+    assert hooks.get_requires_for_build_sdist({}) == ["intree_json_backend_called"]

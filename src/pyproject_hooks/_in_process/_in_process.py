@@ -70,6 +70,12 @@ def _build_backend():
     if extra_pathitems:
         # Ensure in-tree backend directories have the highest priority when importing.
         sys.meta_path.insert(0, _BackendPathFinder(extra_pathitems, mod_path))
+        # A module imported before the finder was installed (e.g. stdlib
+        # ``json``, imported at the top of this script) would be served from
+        # sys.modules without consulting it, shadowing an in-tree backend of
+        # the same name. PEP 517 requires backend-path to win, so evict any
+        # cached top-level backend module before importing it.
+        sys.modules.pop(mod_path.partition(".")[0], None)
 
     try:
         obj = import_module(mod_path)
