@@ -264,3 +264,44 @@ def test_warnings():
     with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
         with pytest.warns(BuildBackendWarning, match="this is my example warning"):
             hooks.get_requires_for_build_wheel({})
+
+
+@pytest.mark.parametrize("backend_path", [None, []])
+def test_inherited_backend_path_is_not_used(monkeypatch, tmp_path, backend_path):
+    """A backend-path inherited from the calling process must not be used.
+
+    ``_PYPROJECT_HOOKS_BACKEND_PATH_JSON`` is an internal transport variable.
+    When hooks are invoked by a process that already has it set (for example a
+    build backend driving a nested build), it must not decide where this caller
+    imports the backend from.
+    """
+    decoy = tmp_path / "decoy"
+    decoy.mkdir()
+    (decoy / "buildsys.py").write_text(
+        "def get_requires_for_build_wheel(config_settings=None):\n"
+        "    return ['decoy backend was used']\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("_PYPROJECT_HOOKS_BACKEND_PATH_JSON", json.dumps([str(decoy)]))
+
+    hooks = get_hooks("pkg1", backend_path=backend_path)
+    with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
+        res = hooks.get_requires_for_build_wheel({})
+    assert res == ["wheelwright"]
+
+
+def test_inherited_backend_path_does_not_make_backend_unimportable(
+    monkeypatch, tmp_path
+):
+    """An unrelated inherited backend-path must not fail the import.
+
+    Before the fix this raised ``BackendUnavailable: Cannot find module
+    'buildsys' in [...]``, naming a directory the caller never asked for.
+    """
+    monkeypatch.setenv(
+        "_PYPROJECT_HOOKS_BACKEND_PATH_JSON", json.dumps([str(tmp_path / "gone")])
+    )
+
+    hooks = get_hooks("pkg1")
+    with modified_env({"PYTHONPATH": BUILDSYS_PKGS}):
+        assert hooks.get_requires_for_build_wheel({}) == ["wheelwright"]

@@ -396,12 +396,18 @@ class BuildBackendHookCaller:
         )
 
     def _call_hook(self, hook_name: str, kwargs: Mapping[str, Any]) -> Any:
+        # Both transport variables are authoritative: a value inherited from the
+        # calling process (hooks may be invoked from within a hook process) must
+        # never decide which backend the child imports.
         extra_environ = {"_PYPROJECT_HOOKS_BUILD_BACKEND": self.build_backend}
 
         if self.backend_path:
             extra_environ["_PYPROJECT_HOOKS_BACKEND_PATH_JSON"] = json.dumps(
                 self.backend_path
             )
+        elif "_PYPROJECT_HOOKS_BACKEND_PATH_JSON" in os.environ:
+            # An empty value means "no backend-path" in the hook process.
+            extra_environ["_PYPROJECT_HOOKS_BACKEND_PATH_JSON"] = ""
 
         with tempfile.TemporaryDirectory() as td:
             hook_input = {"kwargs": kwargs}
